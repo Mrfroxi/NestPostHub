@@ -19,8 +19,18 @@ export class UserService {
       passwordHash: dto.password,
     });
 
+    user.makeEmailConfirmed();
+
     await this.userRepository.save(user);
 
     return user.id;
+  }
+
+  async deleteUser(id: string) {
+    const user: UserDocument = await this.userRepository.findOrNotFoundFail(id);
+
+    user.makeDeleted();
+
+    await this.userRepository.save(user);
   }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Param, Post } from '@nestjs/common';
 import { UserService } from '../application/user.service';
 import type { CreateUserInputDto } from './input-dto/create-user.input-dto';
 import { UsersQueryRepository } from '../infastructure/query/users.query-repository';
@@ -16,5 +16,10 @@ export class UserController {
       await this.userService.createAdminUser(createUserInputDto);
 
     return this.userQueryRepository.getByIdOrNotFoundFail(userId);
+  }
+
+  @Delete(':id')
+  async deleteUser(@Param('id') id: string) {
+    return this.userService.deleteUser(id);
   }
 }

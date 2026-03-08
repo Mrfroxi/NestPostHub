@@ -37,6 +37,21 @@ export class User {
 
     return user as UserDocument;
   }
+
+  makeEmailConfirmed() {
+    if (this.isEmailConfirmed) {
+      throw new Error('Entity already EmailConfirmed');
+    }
+
+    this.isEmailConfirmed = true;
+  }
+
+  makeDeleted() {
+    if (this.deletedAt !== null) {
+      throw new Error('Entity already deleted');
+    }
+    this.deletedAt = new Date();
+  }
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
