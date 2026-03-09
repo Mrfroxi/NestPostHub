@@ -4,19 +4,23 @@ import { User, UserDocument } from '../domain/user.entity';
 import type { UserModelType } from '../domain/user.entity';
 import type { CreateUserInputDto } from '../api/input-dto/create-user.input-dto';
 import { UsersRepository } from '../infastructure/users.repository';
+import { Argon2Service } from '../../../core/external-service/argon2.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private UserModel: UserModelType,
     private userRepository: UsersRepository,
+    private argon2Service: Argon2Service,
   ) {}
 
   async createAdminUser(dto: CreateUserInputDto): Promise<string> {
+    const passwordHash = await this.argon2Service.hashPassword(dto.password);
+
     const user: UserDocument = this.UserModel.createInstance({
       email: dto.email,
       login: dto.login,
-      passwordHash: dto.password,
+      passwordHash,
     });
 
     user.makeEmailConfirmed();
