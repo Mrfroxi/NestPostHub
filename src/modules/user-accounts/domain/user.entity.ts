@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model, Types } from 'mongoose';
 import { CreateUserDomainDto } from './dto/create-user.damain.dto';
+import { NotFoundException } from '@nestjs/common';
 
 @Schema({ timestamps: true })
 export class User {
@@ -48,7 +49,7 @@ export class User {
 
   makeDeleted() {
     if (this.deletedAt !== null) {
-      throw new Error('Entity already deleted');
+      throw new NotFoundException('Entity already deleted');
     }
     this.deletedAt = new Date();
   }
