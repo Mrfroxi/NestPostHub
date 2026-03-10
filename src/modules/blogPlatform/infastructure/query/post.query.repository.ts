@@ -25,10 +25,17 @@ export class PostQueryRepository {
     return PostOutputDto.mapToOut(post);
   }
 
-  async getAll(query: GetPostsQueryInputDto) {
+  async getAll(
+    query: GetPostsQueryInputDto,
+    blogId?: string,
+  ): Promise<PaginatedViewDto<PostOutputDto[]>> {
     const filter: FilterQuery<Post> = {
       deletedAt: null,
     };
+
+    if (blogId) {
+      filter.blogId = blogId;
+    }
 
     const posts: PostDocument[] = await this.PostModel.find(filter)
       .sort({ [query.sortBy]: query.sortDirection })

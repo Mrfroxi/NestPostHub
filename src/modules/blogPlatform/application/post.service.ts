@@ -14,7 +14,7 @@ export class PostService {
   ) {}
 
   async createPost(dto: CreatePostDto): Promise<string> {
-    const post = this.PostModel.createInstance(dto);
+    const post: PostDocument = this.PostModel.createInstance(dto);
 
     await this.PostRepository.save(post);
 
