@@ -20,7 +20,10 @@ export class PostQueryRepository {
   ) {}
 
   async findOrNotFoundFail(id: string): Promise<PostOutputDto> {
-    const post: PostDocument | null = await this.PostModel.findById(id);
+    const post: PostDocument | null = await this.PostModel.findOne({
+      _id: id,
+      deletedAt: null,
+    });
 
     if (!post) {
       throw new NotFoundException();
