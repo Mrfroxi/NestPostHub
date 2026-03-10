@@ -6,6 +6,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Blog, BlogSchema } from './domain/blog.entity';
 import { BlogQueryRepository } from './infastructure/query/blog.query.repository';
 import { Post, PostSchema } from './domain/post.entity';
+import { PostController } from './api/post.controller';
+import { PostService } from './application/post.service';
+import { PostRepository } from './infastructure/post.repository';
+import { PostQueryRepository } from './infastructure/query/post.query.repository';
 
 @Module({
   imports: [
@@ -14,7 +18,14 @@ import { Post, PostSchema } from './domain/post.entity';
       { name: Post.name, schema: PostSchema },
     ]),
   ],
-  controllers: [BlogController],
-  providers: [BlogService, BlogRepository, BlogQueryRepository],
+  controllers: [BlogController, PostController],
+  providers: [
+    BlogService,
+    BlogRepository,
+    BlogQueryRepository,
+    PostService,
+    PostRepository,
+    PostQueryRepository,
+  ],
 })
 export class BlogPlatformModule {}

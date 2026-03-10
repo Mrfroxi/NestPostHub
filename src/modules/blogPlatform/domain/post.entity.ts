@@ -1,8 +1,60 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Model } from 'mongoose';
+import { HydratedDocument, Model, Types } from 'mongoose';
+import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
+import { NotFoundException } from '@nestjs/common';
 
 @Schema({ timestamps: true })
-export class Post {}
+export class Post {
+  _id: Types.ObjectId;
+
+  @Prop({ type: String, required: true })
+  title: string;
+
+  @Prop({ type: String, required: true })
+  shortDescription: string;
+
+  @Prop({ type: String, required: true })
+  content: string;
+
+  @Prop({ type: String, required: true })
+  blogId: string;
+
+  createdAt: Date;
+
+  updatedAt: Date;
+
+  @Prop({ type: Date, nullable: true, default: null })
+  deletedAt: Date | null;
+
+  get getId(): string {
+    return this._id.toString();
+  }
+
+  static createInstance(dto: CreatePostDto): PostDocument {
+    const post = new this();
+    post.title = dto.title;
+    post.shortDescription = dto.shortDescription;
+    post.content = dto.content;
+    post.blogId = dto.blogId;
+
+    return post as PostDocument;
+  }
+
+  update(dto: UpdatePostDto) {
+    this.title = dto.title;
+    this.shortDescription = dto.shortDescription;
+    this.content = dto.content;
+    this.blogId = dto.blogId;
+  }
+
+  makeDeleted() {
+    if (this.deletedAt !== null) {
+      throw new NotFoundException();
+    }
+    this.deletedAt = new Date();
+  }
+}
 
 export const PostSchema = SchemaFactory.createForClass(Post);
 
