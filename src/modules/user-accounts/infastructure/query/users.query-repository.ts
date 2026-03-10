@@ -5,16 +5,16 @@ import {
   UserDocument,
   type UserModelType,
 } from '../../domain/user.entity';
-import { UserViewDto } from '../../api/view-dto/users.view-dto';
 import { FilterQuery } from 'mongoose';
 import { GetUsersQueryParams } from '../../api/input-dto/get-users-query-params.input-dto';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
+import { UserOutputDtoDto } from '../../api/output/users.output-dto';
 
 @Injectable()
 export class UsersQueryRepository {
   constructor(@InjectModel(User.name) private UserModel: UserModelType) {}
 
-  async getByIdOrNotFoundFail(id: string): Promise<UserViewDto> {
+  async getByIdOrNotFoundFail(id: string): Promise<UserOutputDtoDto> {
     const user: UserDocument | null = await this.UserModel.findOne({
       _id: id,
       deletedAt: null,
@@ -24,7 +24,7 @@ export class UsersQueryRepository {
       throw new NotFoundException('user not found');
     }
 
-    return UserViewDto.mapToView(user);
+    return UserOutputDtoDto.mapToView(user);
   }
 
   async getAll(query: GetUsersQueryParams) {
@@ -53,8 +53,8 @@ export class UsersQueryRepository {
 
     const totalCount: number = await this.UserModel.countDocuments(filter);
 
-    const items: UserViewDto[] = users.map((user: UserDocument) =>
-      UserViewDto.mapToView(user),
+    const items: UserOutputDtoDto[] = users.map((user: UserDocument) =>
+      UserOutputDtoDto.mapToView(user),
     );
 
     return PaginatedViewDto.mapToView({

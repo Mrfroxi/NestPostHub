@@ -27,7 +27,7 @@ export class UserService {
 
     await this.userRepository.save(user);
 
-    return user.id;
+    return user.getId;
   }
 
   async deleteUser(id: string) {

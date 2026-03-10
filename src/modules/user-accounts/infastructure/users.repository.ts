@@ -7,7 +7,7 @@ import type { UserModelType } from '../domain/user.entity';
 export class UsersRepository {
   constructor(@InjectModel(User.name) private UserModel: UserModelType) {}
 
-  async save(user: UserDocument) {
+  async save(user: UserDocument): Promise<void> {
     await user.save();
   }
 

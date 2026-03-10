@@ -25,7 +25,7 @@ export class User {
   @Prop({ type: Date, nullable: true, default: null })
   deletedAt: Date | null;
 
-  get id() {
+  get getId(): string {
     return this._id.toString();
   }
 
