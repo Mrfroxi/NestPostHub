@@ -12,7 +12,10 @@ export class BlogRepository {
   }
 
   async findOrNotFoundFail(id: string): Promise<BlogDocument> {
-    const blog: BlogDocument | null = await this.BlogModel.findById(id);
+    const blog: BlogDocument | null = await this.BlogModel.findOne({
+      _id: id,
+      deletedAt: null,
+    });
 
     if (!blog) {
       throw new NotFoundException();

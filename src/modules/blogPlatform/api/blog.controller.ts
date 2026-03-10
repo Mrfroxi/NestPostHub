@@ -73,10 +73,9 @@ export class BlogController {
   }
 
   @Put(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async update(@Param('id') id: string, @Body() updateBlogDto: UpdateBlogDto) {
-    const blogId: string = await this.blogService.updateById(id, updateBlogDto);
-
-    return this.blogQueryRepository.findOrNotFoundFail(blogId);
+    await this.blogService.updateById(id, updateBlogDto);
   }
 
   @Delete(':id')

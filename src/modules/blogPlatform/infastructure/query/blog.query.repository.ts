@@ -16,7 +16,10 @@ export class BlogQueryRepository {
   constructor(@InjectModel(Blog.name) private BlogModel: BlogModelType) {}
 
   async findOrNotFoundFail(id: string): Promise<BlogOutputDto> {
-    const blog: BlogDocument | null = await this.BlogModel.findById(id);
+    const blog: BlogDocument | null = await this.BlogModel.findOne({
+      _id: id,
+      deletedAt: null,
+    });
 
     if (!blog) {
       throw new NotFoundException();

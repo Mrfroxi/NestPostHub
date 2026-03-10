@@ -19,6 +19,8 @@ import { CommentService } from '../application/comment.service';
 import { CommentQueryRepository } from '../infastructure/query/comment.query.repository';
 import { type CreateCommentByPostDto } from '../domain/dto/create-comment.dto';
 import { GetCommentsQueryInputDto } from './dto/input/get-comments-query.input-dto';
+import { BlogService } from '../application/blog.service';
+import { BlogDocument } from '../domain/blog.entity';
 
 @Controller('posts')
 export class PostController {
@@ -27,6 +29,7 @@ export class PostController {
     private readonly postQueryRepository: PostQueryRepository,
     private readonly commentService: CommentService,
     private readonly commentQueryRepository: CommentQueryRepository,
+    private readonly blogService: BlogService,
   ) {}
 
   @Get()
@@ -36,7 +39,14 @@ export class PostController {
 
   @Post()
   async create(@Body() createPostDto: CreatePostInputDto) {
-    const postId: string = await this.postService.createPost(createPostDto);
+    const blog: BlogDocument = await this.blogService.findById(
+      createPostDto.blogId,
+    );
+
+    const postId: string = await this.postService.createPost({
+      ...createPostDto,
+      blogName: blog.getName,
+    });
 
     return this.postQueryRepository.findOrNotFoundFail(postId);
   }

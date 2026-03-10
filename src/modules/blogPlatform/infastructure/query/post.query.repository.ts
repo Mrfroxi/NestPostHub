@@ -10,10 +10,14 @@ import { PostOutputDto } from '../../api/dto/output/post.output-dto';
 import { GetPostsQueryInputDto } from '../../api/dto/input/get-posts-query.input-dto';
 import { FilterQuery } from 'mongoose';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
+import { Blog, type BlogModelType } from '../../domain/blog.entity';
 
 @Injectable()
 export class PostQueryRepository {
-  constructor(@InjectModel(Post.name) private PostModel: PostModelType) {}
+  constructor(
+    @InjectModel(Post.name) private PostModel: PostModelType,
+    @InjectModel(Blog.name) private BlogModel: BlogModelType,
+  ) {}
 
   async findOrNotFoundFail(id: string): Promise<PostOutputDto> {
     const post: PostDocument | null = await this.PostModel.findById(id);
@@ -29,6 +33,17 @@ export class PostQueryRepository {
     query: GetPostsQueryInputDto,
     blogId?: string,
   ): Promise<PaginatedViewDto<PostOutputDto[]>> {
+    if (blogId) {
+      const blog = await this.BlogModel.findOne({
+        _id: blogId,
+        deletedAt: null,
+      });
+
+      if (!blog) {
+        throw new NotFoundException();
+      }
+    }
+
     const filter: FilterQuery<Post> = {
       deletedAt: null,
     };
