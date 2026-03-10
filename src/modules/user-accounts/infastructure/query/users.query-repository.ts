@@ -6,6 +6,9 @@ import {
   type UserModelType,
 } from '../../domain/user.entity';
 import { UserViewDto } from '../../api/view-dto/users.view-dto';
+import { FilterQuery } from 'mongoose';
+import { GetUsersQueryParams } from '../../api/input-dto/get-users-query-params.input-dto';
+import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -22,5 +25,43 @@ export class UsersQueryRepository {
     }
 
     return UserViewDto.mapToView(user);
+  }
+
+  async getAll(query: GetUsersQueryParams) {
+    const filter: FilterQuery<User> = {
+      deletedAt: null,
+    };
+
+    if (query.searchLoginTerm) {
+      filter.$or = filter.$or || [];
+      filter.$or.push({
+        login: { $regex: query.searchLoginTerm, $options: 'i' },
+      });
+    }
+
+    if (query.searchEmailTerm) {
+      filter.$or = filter.$or || [];
+      filter.$or.push({
+        email: { $regex: query.searchEmailTerm, $options: 'i' },
+      });
+    }
+
+    const users: UserDocument[] = await this.UserModel.find(filter)
+      .sort({ [query.sortBy]: query.sortDirection })
+      .skip(query.calculateSkip())
+      .limit(query.pageSize);
+
+    const totalCount: number = await this.UserModel.countDocuments(filter);
+
+    const items: UserViewDto[] = users.map((user: UserDocument) =>
+      UserViewDto.mapToView(user),
+    );
+
+    return PaginatedViewDto.mapToView({
+      items,
+      totalCount,
+      page: query.pageNumber,
+      size: query.pageSize,
+    });
   }
 }

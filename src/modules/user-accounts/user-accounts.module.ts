@@ -12,6 +12,11 @@ import { Argon2Service } from '../../core/external-service/argon2.service';
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
   controllers: [UserController],
-  providers: [UserService, UsersRepository, UsersQueryRepository, Argon2Service],
+  providers: [
+    UserService,
+    UsersRepository,
+    UsersQueryRepository,
+    Argon2Service,
+  ],
 })
 export class UserAccountsModule {}

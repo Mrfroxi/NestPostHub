@@ -2,14 +2,18 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpCode,
   HttpStatus,
   Param,
   Post,
+  Query,
 } from '@nestjs/common';
 import { UserService } from '../application/user.service';
 import { CreateUserInputDto } from './input-dto/create-user.input-dto';
 import { UsersQueryRepository } from '../infastructure/query/users.query-repository';
+import { GetUsersQueryParams } from './input-dto/get-users-query-params.input-dto';
+import { UserViewDto } from './view-dto/users.view-dto';
 
 @Controller('users')
 export class UserController {
@@ -18,8 +22,15 @@ export class UserController {
     private readonly userQueryRepository: UsersQueryRepository,
   ) {}
 
+  @Get()
+  async getAll(@Query() query: GetUsersQueryParams) {
+    return this.userQueryRepository.getAll(query);
+  }
+
   @Post()
-  async createUser(@Body() createUserInputDto: CreateUserInputDto) {
+  async createUser(
+    @Body() createUserInputDto: CreateUserInputDto,
+  ): Promise<UserViewDto> {
     const userId: string =
       await this.userService.createAdminUser(createUserInputDto);
 
