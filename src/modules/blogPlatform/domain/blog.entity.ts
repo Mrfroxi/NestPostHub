@@ -23,11 +23,15 @@ export class Blog {
   @Prop({ type: Date, nullable: true, default: null })
   deletedAt: Date | null;
 
-  @Prop({ type: Boolean, default: true })
+  @Prop({ type: Boolean, default: false })
   isMembership: boolean;
 
   get getId(): string {
     return this._id.toString();
+  }
+
+  get getName(): string {
+    return this.name;
   }
 
   static createInstance(dto: CreateBlogDto): BlogDocument {

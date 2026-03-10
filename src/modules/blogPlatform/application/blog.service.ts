@@ -13,6 +13,10 @@ export class BlogService {
     private readonly BlogRepository: BlogRepository,
   ) {}
 
+  async findById(id: string): Promise<BlogDocument> {
+    return this.BlogRepository.findOrNotFoundFail(id);
+  }
+
   async createBlog(dto: CreateBlogDto): Promise<string> {
     const blog = this.BlogModule.createInstance(dto);
 

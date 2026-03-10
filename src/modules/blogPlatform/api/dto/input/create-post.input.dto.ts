@@ -3,4 +3,5 @@ export class CreatePostInputDto {
   shortDescription: string;
   content: string;
   blogId: string;
+  blogName: string;
 }

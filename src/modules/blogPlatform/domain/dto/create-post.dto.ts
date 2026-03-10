@@ -1,5 +1,6 @@
 export interface CreatePostDto extends CreatePostByBlog {
   blogId: string;
+  blogName: string;
 }
 
 export interface CreatePostByBlog {

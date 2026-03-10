@@ -18,10 +18,10 @@ import { type UpdateBlogDto } from '../domain/dto/update-blog.dto';
 import { type CreatePostByBlog } from '../domain/dto/create-post.dto';
 import { PostService } from '../application/post.service';
 import { PostQueryRepository } from '../infastructure/query/post.query.repository';
-import { BaseQueryParams } from '../../../core/dto/base.query.sort-params.input-dto';
 import { GetPostsQueryInputDto } from './dto/input/get-posts-query.input-dto';
+import { Blog, BlogDocument } from '../domain/blog.entity';
 
-@Controller('blog')
+@Controller('blogs')
 export class BlogController {
   constructor(
     private readonly blogService: BlogService,
@@ -48,8 +48,11 @@ export class BlogController {
     @Body()
     createPostDto: CreatePostByBlog,
   ) {
+    const blog: BlogDocument = await this.blogService.findById(blogId);
+
     const postId: string = await this.postService.createPost({
       blogId,
+      blogName: blog.getName,
       ...createPostDto,
     });
 

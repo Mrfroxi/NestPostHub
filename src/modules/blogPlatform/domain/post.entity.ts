@@ -20,6 +20,21 @@ export class Post {
   @Prop({ type: String, required: true })
   blogId: string;
 
+  @Prop({ type: String, required: true })
+  blogName: string;
+
+  @Prop({ type: Object, required: true })
+  extendedLikesInfo: {
+    likesCount: number;
+    dislikesCount: number;
+    myStatus: string;
+    newestLikes: Array<{
+      userId: string;
+      login: string;
+      addedAt: Date;
+    }>;
+  };
+
   createdAt: Date;
 
   updatedAt: Date;
@@ -37,6 +52,13 @@ export class Post {
     post.shortDescription = dto.shortDescription;
     post.content = dto.content;
     post.blogId = dto.blogId;
+    post.blogName = dto.blogName;
+    post.extendedLikesInfo = {
+      likesCount: 0,
+      dislikesCount: 0,
+      myStatus: 'None',
+      newestLikes: [],
+    };
 
     return post as PostDocument;
   }

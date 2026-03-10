@@ -6,7 +6,18 @@ export class PostOutputDto {
   shortDescription: string;
   content: string;
   blogId: string;
+  blogName: string;
   createdAt: Date;
+  extendedLikesInfo: {
+    likesCount: number;
+    dislikesCount: number;
+    myStatus: string;
+    newestLikes: Array<{
+      userId: string;
+      login: string;
+      addedAt: Date;
+    }>;
+  };
 
   static mapToOut(post: PostDocument): PostOutputDto {
     const dto = new this();
@@ -15,6 +26,8 @@ export class PostOutputDto {
     dto.shortDescription = post.shortDescription;
     dto.content = post.content;
     dto.blogId = post.blogId;
+    dto.blogName = post.blogName;
+    dto.extendedLikesInfo = post.extendedLikesInfo;
     dto.createdAt = post.createdAt;
 
     return dto;
