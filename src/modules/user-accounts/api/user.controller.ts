@@ -12,7 +12,7 @@ import {
 import { UserService } from '../application/user.service';
 import { CreateUserInputDto } from './input-dto/create-user.input-dto';
 import { UsersQueryRepository } from '../infastructure/query/users.query-repository';
-import { GetUsersQueryParams } from './input-dto/get-users-query-params.input-dto';
+import { GetUsersQueryParams } from './input-dto/get-users-query.input-dto';
 import { UserOutputDtoDto } from './output/users.output-dto';
 
 @Controller('users')

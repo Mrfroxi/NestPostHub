@@ -6,7 +6,7 @@ import {
   type UserModelType,
 } from '../../domain/user.entity';
 import { FilterQuery } from 'mongoose';
-import { GetUsersQueryParams } from '../../api/input-dto/get-users-query-params.input-dto';
+import { GetUsersQueryParams } from '../../api/input-dto/get-users-query.input-dto';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
 import { UserOutputDtoDto } from '../../api/output/users.output-dto';
 

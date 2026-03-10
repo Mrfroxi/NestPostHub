@@ -1,6 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model, Types } from 'mongoose';
 import { CreateBlogDto } from './dto/create-blog.dto';
+import { UpdateBlogDto } from './dto/update-blog.dto';
+import { NotFoundException } from '@nestjs/common';
 
 @Schema({ timestamps: true })
 export class Blog {
@@ -35,6 +37,19 @@ export class Blog {
     blog.websiteUrl = dto.websiteUrl;
 
     return blog as BlogDocument;
+  }
+
+  update(dto: UpdateBlogDto) {
+    this.name = dto.name;
+    this.description = dto.description;
+    this.websiteUrl = dto.websiteUrl;
+  }
+
+  makeDeleted() {
+    if (this.deletedAt !== null) {
+      throw new NotFoundException();
+    }
+    this.deletedAt = new Date();
   }
 }
 
