@@ -15,7 +15,7 @@ export class UsersRepository {
     const user: UserDocument | null = await this.UserModel.findById(id);
 
     if (!user) {
-      throw new NotFoundException('user not found');
+      throw new NotFoundException();
     }
 
     return user;

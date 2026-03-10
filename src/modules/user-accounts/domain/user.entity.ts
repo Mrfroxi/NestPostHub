@@ -49,7 +49,7 @@ export class User {
 
   makeDeleted() {
     if (this.deletedAt !== null) {
-      throw new NotFoundException('Entity already deleted');
+      throw new NotFoundException();
     }
     this.deletedAt = new Date();
   }
