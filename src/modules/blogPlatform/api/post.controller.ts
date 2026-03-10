@@ -15,12 +15,18 @@ import { CreatePostInputDto } from './dto/input/create-post.input.dto';
 import { PostQueryRepository } from '../infastructure/query/post.query.repository';
 import { GetPostsQueryInputDto } from './dto/input/get-posts-query.input-dto';
 import { type UpdatePostDto } from '../domain/dto/update-post.dto';
+import { CommentService } from '../application/comment.service';
+import { CommentQueryRepository } from '../infastructure/query/comment.query.repository';
+import { type CreateCommentByPostDto } from '../domain/dto/create-comment.dto';
+import { GetCommentsQueryInputDto } from './dto/input/get-comments-query.input-dto';
 
 @Controller('posts')
 export class PostController {
   constructor(
     private readonly postService: PostService,
     private readonly postQueryRepository: PostQueryRepository,
+    private readonly commentService: CommentService,
+    private readonly commentQueryRepository: CommentQueryRepository,
   ) {}
 
   @Get()
@@ -51,5 +57,26 @@ export class PostController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePost(@Param('id') id: string) {
     await this.postService.deleteById(id);
+  }
+
+  @Post(':postId/comments')
+  async createComment(
+    @Param('postId') postId: string,
+    @Body() createCommentDto: CreateCommentByPostDto,
+  ) {
+    const commentId: string = await this.commentService.createComment({
+      postId,
+      ...createCommentDto,
+    });
+
+    return this.commentQueryRepository.getById(commentId);
+  }
+
+  @Get(':postId/comments')
+  async getCommentsByPost(
+    @Param('postId') postId: string,
+    @Query() query: GetCommentsQueryInputDto,
+  ) {
+    return this.commentQueryRepository.getAll(query, postId);
   }
 }
