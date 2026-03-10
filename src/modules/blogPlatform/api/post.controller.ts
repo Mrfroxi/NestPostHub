@@ -57,10 +57,9 @@ export class PostController {
   }
 
   @Put(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    const postId: string = await this.postService.updateById(id, updatePostDto);
-
-    return this.postQueryRepository.findOrNotFoundFail(postId);
+    await this.postService.updateById(id, updatePostDto);
   }
 
   @Delete(':id')

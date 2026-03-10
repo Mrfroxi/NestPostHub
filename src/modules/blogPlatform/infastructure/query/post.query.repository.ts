@@ -72,7 +72,10 @@ export class PostQueryRepository {
   }
 
   async getById(id: string) {
-    const post = await this.PostModel.findById(id);
+    const post = await this.PostModel.findOne({
+      _id: id,
+      deletedAt: null,
+    });
 
     if (!post) {
       throw new NotFoundException();

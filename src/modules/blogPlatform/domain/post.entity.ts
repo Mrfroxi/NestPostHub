@@ -23,7 +23,16 @@ export class Post {
   @Prop({ type: String, required: true })
   blogName: string;
 
-  @Prop({ type: Object, required: true, default: { likesCount: 0, dislikesCount: 0, myStatus: 'None', newestLikes: [] } })
+  @Prop({
+    type: Object,
+    required: true,
+    default: {
+      likesCount: 0,
+      dislikesCount: 0,
+      myStatus: 'None',
+      newestLikes: [],
+    },
+  })
   extendedLikesInfo: {
     likesCount: number;
     dislikesCount: number;

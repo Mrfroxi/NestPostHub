@@ -60,7 +60,10 @@ export class BlogQueryRepository {
   }
 
   async getById(id: string) {
-    const blog = await this.BlogModel.findById(id);
+    const blog = await this.BlogModel.findOne({
+      _id: id,
+      deletedAt: null,
+    });
 
     if (!blog) {
       throw new NotFoundException();

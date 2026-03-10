@@ -19,7 +19,7 @@ import { type CreatePostByBlog } from '../domain/dto/create-post.dto';
 import { PostService } from '../application/post.service';
 import { PostQueryRepository } from '../infastructure/query/post.query.repository';
 import { GetPostsQueryInputDto } from './dto/input/get-posts-query.input-dto';
-import { Blog, BlogDocument } from '../domain/blog.entity';
+import { BlogDocument } from '../domain/blog.entity';
 
 @Controller('blogs')
 export class BlogController {

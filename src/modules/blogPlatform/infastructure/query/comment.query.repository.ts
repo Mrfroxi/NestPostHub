@@ -13,7 +13,9 @@ import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
 
 @Injectable()
 export class CommentQueryRepository {
-  constructor(@InjectModel(Comment.name) private CommentModel: CommentModelType) {}
+  constructor(
+    @InjectModel(Comment.name) private CommentModel: CommentModelType,
+  ) {}
 
   async getById(id: string) {
     const comment = await this.CommentModel.findOne({
