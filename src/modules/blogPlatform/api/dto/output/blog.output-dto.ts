@@ -1,4 +1,4 @@
-import { BlogDocument } from '../../../domain/blod.entity';
+import { BlogDocument } from '../../../domain/blog.entity';
 
 export class BlogOutputDto {
   id: string;

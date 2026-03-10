@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { BlogRepository } from '../infastructure/blog.repository';
 import { CreateBlogDto } from '../domain/dto/create-blog.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Blog, BlogDocument } from '../domain/blod.entity';
-import type { BlogModelType } from '../domain/blod.entity';
+import { Blog, BlogDocument } from '../domain/blog.entity';
+import type { BlogModelType } from '../domain/blog.entity';
 import { UpdateBlogDto } from '../domain/dto/update-blog.dto';
 
 @Injectable()

@@ -5,11 +5,10 @@ import {
   Blog,
   BlogDocument,
   type BlogModelType,
-} from '../../domain/blod.entity';
+} from '../../domain/blog.entity';
 import { BlogOutputDto } from '../../api/dto/output/blog.output-dto';
 import { GetBlogsQueryInputDto } from '../../api/dto/input/get-blogs-query.input-dto';
 import { FilterQuery } from 'mongoose';
-import { User } from '../../../user-accounts/domain/user.entity';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
 
 @Injectable()
@@ -27,25 +26,25 @@ export class BlogQueryRepository {
   }
 
   async getAll(query: GetBlogsQueryInputDto) {
-    const filter: FilterQuery<User> = {
+    const filter: FilterQuery<Blog> = {
       deletedAt: null,
     };
 
     if (query.searchNameTerm) {
       filter.$or = filter.$or || [];
       filter.$or.push({
-        login: { $regex: query.searchNameTerm, $options: 'i' },
+        name: { $regex: query.searchNameTerm, $options: 'i' },
       });
     }
 
-    const blog: BlogDocument[] = await this.BlogModel.find(filter)
+    const blogs: BlogDocument[] = await this.BlogModel.find(filter)
       .sort({ [query.sortBy]: query.sortDirection })
       .skip(query.calculateSkip())
       .limit(query.pageSize);
 
     const totalCount: number = await this.BlogModel.countDocuments(filter);
 
-    const items: BlogOutputDto[] = blog.map((blog: BlogDocument) =>
+    const items: BlogOutputDto[] = blogs.map((blog: BlogDocument) =>
       BlogOutputDto.mapToOut(blog),
     );
 
