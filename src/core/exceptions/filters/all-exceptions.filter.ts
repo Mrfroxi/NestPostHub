@@ -34,7 +34,7 @@ export class AllHttpExceptionsFilter implements ExceptionFilter {
         timestamp: new Date().toISOString(),
         path: null,
         message: 'Some error occurred',
-        extensions: [],
+        errorsMessages: [],
         code: DomainExceptionCode.InternalServerError,
       };
     }
@@ -43,7 +43,7 @@ export class AllHttpExceptionsFilter implements ExceptionFilter {
       timestamp: new Date().toISOString(),
       path: requestUrl,
       message,
-      extensions: [],
+      errorsMessages: [],
       code: DomainExceptionCode.InternalServerError,
     };
   }

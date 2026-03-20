@@ -5,6 +5,10 @@ export type ErrorResponseBody = {
   timestamp: string;
   path: string | null;
   message: string;
-  extensions: Extension[];
+  errorsMessages: Extension[];
   code: DomainExceptionCode;
+};
+
+export type DomainExceptionsResponseBody = {
+  errorsMessages: Extension[];
 };
