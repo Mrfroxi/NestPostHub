@@ -29,6 +29,14 @@ export class User {
   get getConfirmationCode(): string {
     return this.confirmationCode;
   }
+
+  @Prop({ type: String, required: false, default: '' })
+  recoveryCode: string;
+
+  get getRecoveryCode(): string {
+    return this.recoveryCode;
+  }
+
   createdAt: Date;
   updatedAt: Date;
 
@@ -63,6 +71,10 @@ export class User {
     }
 
     this.confirmationCode = confirmationCode;
+  }
+
+  setRecoveryCode(recoveryCode: string) {
+    this.recoveryCode = recoveryCode;
   }
 
   makeDeleted() {

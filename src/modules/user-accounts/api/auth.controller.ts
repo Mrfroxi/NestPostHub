@@ -5,6 +5,7 @@ import {
   ConfirmationCodeInputDto,
   ResendEmailInputDto,
 } from './input-dto/resendEmail.input.dto';
+import { PasswordRecoveryInputDto } from './input-dto/password-recovery.input-dto';
 
 @Controller('auth')
 export class AuthController {
@@ -32,5 +33,11 @@ export class AuthController {
     @Body() code: ConfirmationCodeInputDto,
   ): Promise<void> {
     await this.userService.confirmationUser(code);
+  }
+
+  @Post('password-recovery')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async passwordRecovery(@Body() dto: PasswordRecoveryInputDto): Promise<void> {
+    await this.userService.passwordRecovery(dto);
   }
 }

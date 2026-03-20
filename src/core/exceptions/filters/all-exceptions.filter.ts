@@ -16,7 +16,7 @@ export class AllHttpExceptionsFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
     // eslint-disable-next-line
-    const message:string = exception.message || 'Unknown exception occurred.';
+    const message: string = exception.message || 'Unknown exception occurred.';
     const status = HttpStatus.INTERNAL_SERVER_ERROR;
     const responseBody = this.buildResponseBody(request.url, message);
 

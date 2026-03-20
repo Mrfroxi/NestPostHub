@@ -13,6 +13,8 @@ import {
   ConfirmationCodeInputDto,
   ResendEmailInputDto,
 } from '../api/input-dto/resendEmail.input.dto';
+import { NewPasswordInputDto } from '../api/input-dto/new-password.input-dto';
+import { PasswordRecoveryInputDto } from '../api/input-dto/password-recovery.input-dto';
 
 @Injectable()
 export class UserService {
@@ -163,5 +165,34 @@ export class UserService {
 
     userByCode.makeEmailConfirmed();
     await this.userRepository.save(userByCode);
+  }
+
+  async passwordRecovery(dto: PasswordRecoveryInputDto): Promise<void> {
+    const userByEmail: UserDocument | null =
+      await this.userRepository.findByEmail(dto.email);
+
+    if (!userByEmail) {
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        extensions: [
+          {
+            message: 'Email not found',
+            field: 'email',
+          },
+        ],
+      });
+    }
+
+    const recoveryCode: string = crypto.randomUUID();
+
+    userByEmail.setRecoveryCode(recoveryCode);
+    await this.userRepository.save(userByEmail);
+
+    void this.mailService.sendMail({
+      from: process.env.NODEMAILER_EMAIL,
+      to: dto.email,
+      subject: 'Password Recovery',
+      text: emailExamples.passwordRecoveryEmail(recoveryCode),
+    });
   }
 }
