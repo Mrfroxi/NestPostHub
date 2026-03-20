@@ -195,4 +195,28 @@ export class UserService {
       text: emailExamples.passwordRecoveryEmail(recoveryCode),
     });
   }
+
+  async newPassword(dto: NewPasswordInputDto): Promise<void> {
+    const userByRecoveryCode: UserDocument | null =
+      await this.userRepository.findByRecoveryCode(dto.recoveryCode);
+
+    if (!userByRecoveryCode) {
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        extensions: [
+          {
+            message: 'Recovery code is incorrect or expired',
+            field: 'recoveryCode',
+          },
+        ],
+      });
+    }
+
+    const passwordHash = await this.argon2Service.hashPassword(dto.newPassword);
+
+    userByRecoveryCode.updatePassword(passwordHash);
+    userByRecoveryCode.clearRecoveryCode();
+
+    await this.userRepository.save(userByRecoveryCode);
+  }
 }

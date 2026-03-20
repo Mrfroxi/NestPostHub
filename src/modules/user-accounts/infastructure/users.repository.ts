@@ -39,4 +39,8 @@ export class UsersRepository {
   findByCode(code: string): Promise<UserDocument | null> {
     return this.UserModel.findOne({ confirmationCode: code });
   }
+
+  findByRecoveryCode(recoveryCode: string): Promise<UserDocument | null> {
+    return this.UserModel.findOne({ recoveryCode, deletedAt: null });
+  }
 }

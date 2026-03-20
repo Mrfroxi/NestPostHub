@@ -77,6 +77,14 @@ export class User {
     this.recoveryCode = recoveryCode;
   }
 
+  updatePassword(passwordHash: string) {
+    this.passwordHash = passwordHash;
+  }
+
+  clearRecoveryCode() {
+    this.recoveryCode = '';
+  }
+
   makeDeleted() {
     if (this.deletedAt !== null) {
       throw new NotFoundException();
