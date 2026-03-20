@@ -8,6 +8,7 @@ import { Argon2Service } from '../../../core/external-service/argon2.service';
 import { MailerService } from '@nestjs-modules/mailer';
 import { DomainException } from '../../../core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '../../../core/exceptions/domain-exception-codes';
+import { emailExamples } from '../../../core/helpers/email-template';
 
 @Injectable()
 export class UserService {
@@ -70,7 +71,7 @@ export class UserService {
       from: process.env.NODEMAILER_EMAIL,
       to: dto.email,
       subject: `How to Send Emails with Nodemailer`,
-      text: 'hey',
+      text: emailExamples.registrationEmail(confirmationCode),
     });
   }
 
