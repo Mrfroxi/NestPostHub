@@ -9,7 +9,10 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { DomainException } from '../../../core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '../../../core/exceptions/domain-exception-codes';
 import { emailExamples } from '../../../core/helpers/email-template';
-import { ResendEmailInputDto } from '../api/input-dto/resendEmail.input.dto';
+import {
+  ConfirmationCodeInputDto,
+  ResendEmailInputDto,
+} from '../api/input-dto/resendEmail.input.dto';
 
 @Injectable()
 export class UserService {
@@ -127,5 +130,38 @@ export class UserService {
       subject: `How to Send Emails with Nodemailer`,
       text: emailExamples.registrationEmail(confirmationCode),
     });
+  }
+
+  async confirmationUser(dto: ConfirmationCodeInputDto): Promise<void> {
+    const userByCode: UserDocument | null =
+      await this.userRepository.findByCode(dto.code);
+
+    if (!userByCode) {
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        extensions: [
+          {
+            message: 'User with the same code not found',
+            field: 'findUserByCode',
+          },
+        ],
+      });
+    }
+    const isConfirmed = userByCode.getIsEmailConfirmed;
+
+    if (isConfirmed) {
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        extensions: [
+          {
+            message: 'User with the same code confirmed',
+            field: 'isConfirmed',
+          },
+        ],
+      });
+    }
+
+    userByCode.makeEmailConfirmed();
+    await this.userRepository.save(userByCode);
   }
 }

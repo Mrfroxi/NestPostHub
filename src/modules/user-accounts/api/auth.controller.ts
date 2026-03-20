@@ -1,7 +1,10 @@
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { UserService } from '../application/user.service';
 import { CreateUserInputDto } from './input-dto/create-user.input-dto';
-import { ResendEmailInputDto } from './input-dto/resendEmail.input.dto';
+import {
+  ConfirmationCodeInputDto,
+  ResendEmailInputDto,
+} from './input-dto/resendEmail.input.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -21,5 +24,13 @@ export class AuthController {
     @Body() resendEmailCodeInputDto: ResendEmailInputDto,
   ): Promise<void> {
     await this.userService.resendEmailCode(resendEmailCodeInputDto);
+  }
+
+  @Post('registration-confirmation')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async confirmationUser(
+    @Body() code: ConfirmationCodeInputDto,
+  ): Promise<void> {
+    await this.userService.confirmationUser(code);
   }
 }

@@ -35,4 +35,8 @@ export class UsersRepository {
   findByEmail(email: string): Promise<UserDocument | null> {
     return this.UserModel.findOne({ email });
   }
+
+  findByCode(code: string): Promise<UserDocument | null> {
+    return this.UserModel.findOne({ confirmationCode: code });
+  }
 }

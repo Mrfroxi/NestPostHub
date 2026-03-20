@@ -5,3 +5,8 @@ export class ResendEmailInputDto {
   @IsEmail()
   email: string;
 }
+
+export class ConfirmationCodeInputDto {
+  @IsString()
+  code: string;
+}
