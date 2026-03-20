@@ -5,6 +5,7 @@ import type { UserModelType } from '../domain/user.entity';
 import type { CreateUserInputDto } from '../api/input-dto/create-user.input-dto';
 import { UsersRepository } from '../infastructure/users.repository';
 import { Argon2Service } from '../../../core/external-service/argon2.service';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class UserService {
@@ -12,6 +13,7 @@ export class UserService {
     @InjectModel(User.name) private UserModel: UserModelType,
     private userRepository: UsersRepository,
     private argon2Service: Argon2Service,
+    private readonly mailService: MailerService,
   ) {}
 
   async createAdminUser(dto: CreateUserInputDto): Promise<string> {
@@ -43,6 +45,13 @@ export class UserService {
 
     user.setConfirmationCode(confirmationCode);
     await this.userRepository.save(user);
+
+    void this.mailService.sendMail({
+      from: process.env.NODEMAILER_EMAIL,
+      to: dto.email,
+      subject: `How to Send Emails with Nodemailer`,
+      text: 'hey',
+    });
   }
 
   async deleteUser(id: string) {

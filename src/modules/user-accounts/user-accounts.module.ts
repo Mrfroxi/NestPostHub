@@ -7,12 +7,14 @@ import { UsersRepository } from './infastructure/users.repository';
 import { UsersQueryRepository } from './infastructure/query/users.query-repository';
 import { Argon2Service } from '../../core/external-service/argon2.service';
 import { AuthController } from './api/auth.controller';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MailerModule,
   ],
-  controllers: [UserController,AuthController],
+  controllers: [UserController, AuthController],
   providers: [
     UserService,
     UsersRepository,

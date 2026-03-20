@@ -8,6 +8,7 @@ import { TestingModule } from './modules/testing/testing.module';
 import { BlogPlatformModule } from './modules/blogPlatform/blog-platform.module';
 import { DomainHttpExceptionsFilter } from './core/exceptions/filters/domain-exceptions.filter';
 import { AllHttpExceptionsFilter } from './core/exceptions/filters/all-exceptions.filter';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
@@ -16,6 +17,15 @@ import { AllHttpExceptionsFilter } from './core/exceptions/filters/all-exception
     UserAccountsModule,
     TestingModule,
     BlogPlatformModule,
+    MailerModule.forRoot({
+      transport: {
+        host: process.env.EMAIL_HOST,
+        auth: {
+          user: process.env.NODEMAILER_EMAIL,
+          pass: process.env.NODEMAILER_PASS,
+        },
+      },
+    }),
   ],
   controllers: [AppController],
   providers: [
