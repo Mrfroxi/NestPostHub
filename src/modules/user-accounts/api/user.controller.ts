@@ -32,7 +32,7 @@ export class UserController {
     @Body() createUserInputDto: CreateUserInputDto,
   ): Promise<UserOutputDtoDto> {
     const userId: string =
-      await this.userService.createAdminUser(createUserInputDto);
+      await this.userService.registerAdminUser(createUserInputDto);
 
     return this.userQueryRepository.getByIdOrNotFoundFail(userId);
   }

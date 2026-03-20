@@ -27,4 +27,12 @@ export class UsersRepository {
 
     return user;
   }
+
+  findByLogin(login: string): Promise<UserDocument | null> {
+    return this.UserModel.findOne({ login });
+  }
+
+  findByEmail(login: string): Promise<UserDocument | null> {
+    return this.UserModel.findOne({ login });
+  }
 }
