@@ -19,6 +19,9 @@ export class User {
   @Prop({ type: Boolean, default: false })
   isEmailConfirmed: boolean;
 
+  @Prop({ type: String, required: false, default: '' })
+  confirmationCode: string;
+
   createdAt: Date;
   updatedAt: Date;
 
@@ -45,6 +48,14 @@ export class User {
     }
 
     this.isEmailConfirmed = true;
+  }
+
+  setConfirmationCode(confirmationCode: string) {
+    if (this.confirmationCode) {
+      throw new Error('Entity already confirmationCode');
+    }
+
+    this.confirmationCode = confirmationCode;
   }
 
   makeDeleted() {

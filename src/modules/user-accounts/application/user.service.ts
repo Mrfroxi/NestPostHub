@@ -30,6 +30,21 @@ export class UserService {
     return user.getId;
   }
 
+  async createUser(dto: CreateUserInputDto): Promise<void> {
+    const passwordHash = await this.argon2Service.hashPassword(dto.password);
+
+    const confirmationCode: string = crypto.randomUUID();
+
+    const user: UserDocument = this.UserModel.createInstance({
+      email: dto.email,
+      login: dto.login,
+      passwordHash,
+    });
+
+    user.setConfirmationCode(confirmationCode);
+    await this.userRepository.save(user);
+  }
+
   async deleteUser(id: string) {
     const user: UserDocument = await this.userRepository.findOrNotFoundFail(id);
 

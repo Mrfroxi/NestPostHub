@@ -7,15 +7,19 @@ import type { BlogModelType } from '../domain/blog.entity';
 export class BlogRepository {
   constructor(@InjectModel(Blog.name) private BlogModel: BlogModelType) {}
 
+  async findById(id: string): Promise<BlogDocument | null> {
+    return this.BlogModel.findOne({
+      _id: id,
+      deletedAt: null,
+    });
+  }
+
   async save(blog: BlogDocument): Promise<void> {
     await blog.save();
   }
 
   async findOrNotFoundFail(id: string): Promise<BlogDocument> {
-    const blog: BlogDocument | null = await this.BlogModel.findOne({
-      _id: id,
-      deletedAt: null,
-    });
+    const blog: BlogDocument | null = await this.findById(id);
 
     if (!blog) {
       throw new NotFoundException();
