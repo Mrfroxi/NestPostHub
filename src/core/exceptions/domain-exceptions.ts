@@ -9,7 +9,7 @@ export class Extension {
 
 interface DomainExceptionInfo {
   code: DomainExceptionCode;
-  message: string;
+  message?: string;
   extensions?: Extension[];
 }
 
@@ -20,7 +20,7 @@ export class DomainException extends Error {
 
   constructor(errorInfo: DomainExceptionInfo) {
     super(errorInfo.message);
-    this.message = errorInfo.message;
+    this.message = errorInfo.message ?? '';
     this.code = errorInfo.code;
     this.extensions = errorInfo.extensions ?? [];
   }

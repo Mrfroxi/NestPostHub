@@ -19,9 +19,16 @@ export class User {
   @Prop({ type: Boolean, default: false })
   isEmailConfirmed: boolean;
 
+  get getIsEmailConfirmed(): boolean {
+    return this.isEmailConfirmed;
+  }
+
   @Prop({ type: String, required: false, default: '' })
   confirmationCode: string;
 
+  get getConfirmationCode(): string {
+    return this.confirmationCode;
+  }
   createdAt: Date;
   updatedAt: Date;
 

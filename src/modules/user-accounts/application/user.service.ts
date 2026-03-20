@@ -9,6 +9,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { DomainException } from '../../../core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '../../../core/exceptions/domain-exception-codes';
 import { emailExamples } from '../../../core/helpers/email-template';
+import { ResendEmailInputDto } from '../api/input-dto/resendEmail.input.dto';
 
 @Injectable()
 export class UserService {
@@ -26,7 +27,12 @@ export class UserService {
     if (userWithTheSameLogin) {
       throw new DomainException({
         code: DomainExceptionCode.BadRequest,
-        message: 'User with the same login already exists',
+        extensions: [
+          {
+            message: 'User with the same login already exists',
+            field: 'login',
+          },
+        ],
       });
     }
 
@@ -36,7 +42,12 @@ export class UserService {
     if (userWithTheSameEmail) {
       throw new DomainException({
         code: DomainExceptionCode.BadRequest,
-        message: 'User with the same login already exists',
+        extensions: [
+          {
+            message: 'User with the same email already exists',
+            field: 'email',
+          },
+        ],
       });
     }
 
@@ -81,5 +92,40 @@ export class UserService {
     user.makeDeleted();
 
     await this.userRepository.save(user);
+  }
+
+  async resendEmailCode(dto: ResendEmailInputDto): Promise<void> {
+    const userByEmail: UserDocument | null =
+      await this.userRepository.findByEmail(dto.email);
+
+    if (!userByEmail) {
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        extensions: [{ message: 'Email not found', field: 'email' }],
+      });
+    }
+
+    const isConfirmed: any = userByEmail.getIsEmailConfirmed;
+
+    if (isConfirmed) {
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        extensions: [
+          {
+            message: 'User with the same email already confirmed',
+            field: 'email',
+          },
+        ],
+      });
+    }
+
+    const confirmationCode: string = userByEmail.getConfirmationCode;
+
+    void this.mailService.sendMail({
+      from: process.env.NODEMAILER_EMAIL,
+      to: dto.email,
+      subject: `How to Send Emails with Nodemailer`,
+      text: emailExamples.registrationEmail(confirmationCode),
+    });
   }
 }

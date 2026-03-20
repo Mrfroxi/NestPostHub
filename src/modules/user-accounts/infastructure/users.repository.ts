@@ -32,7 +32,7 @@ export class UsersRepository {
     return this.UserModel.findOne({ login });
   }
 
-  findByEmail(login: string): Promise<UserDocument | null> {
-    return this.UserModel.findOne({ login });
+  findByEmail(email: string): Promise<UserDocument | null> {
+    return this.UserModel.findOne({ email });
   }
 }
