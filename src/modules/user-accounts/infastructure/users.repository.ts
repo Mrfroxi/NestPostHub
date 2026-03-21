@@ -43,4 +43,11 @@ export class UsersRepository {
   findByRecoveryCode(recoveryCode: string): Promise<UserDocument | null> {
     return this.UserModel.findOne({ recoveryCode, deletedAt: null });
   }
+
+  findByLoginOrEmail(loginOrEmail: string): Promise<UserDocument | null> {
+    return this.UserModel.findOne({
+      $or: [{ login: loginOrEmail }, { email: loginOrEmail }],
+      deletedAt: null,
+    });
+  }
 }

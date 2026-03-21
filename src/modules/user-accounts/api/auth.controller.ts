@@ -7,14 +7,19 @@ import {
 } from './input-dto/resendEmail.input.dto';
 import { NewPasswordInputDto } from './input-dto/new-password.input-dto';
 import { PasswordRecoveryInputDto } from './input-dto/password-recovery.input-dto';
+import { LoginInputDto } from './input-dto/login.input-dto';
+import { AuthService } from '../application/auth.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly authService: AuthService,
+  ) {}
 
   @Post('registration')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async createUser(
+  async registerUser(
     @Body() createUserInputDto: CreateUserInputDto,
   ): Promise<void> {
     await this.userService.registerUser(createUserInputDto);
@@ -46,5 +51,15 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async newPassword(@Body() dto: NewPasswordInputDto): Promise<void> {
     await this.userService.newPassword(dto);
+  }
+
+  @Post('login')
+  async login(@Body() dto: LoginInputDto) {
+    const user = await this.authService.validateUser(
+      dto.loginOrEmail,
+      dto.password,
+    );
+
+    return this.authService.login(user);
   }
 }

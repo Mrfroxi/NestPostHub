@@ -1,8 +1,8 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Request } from 'express';
 import { Reflector } from '@nestjs/core';
-import { DomainException } from '../exceptions/domain-exceptions';
-import { DomainExceptionCode } from '../exceptions/domain-exception-codes';
+import { DomainException } from '../../exceptions/domain-exceptions';
+import { DomainExceptionCode } from '../../exceptions/domain-exception-codes';
 
 @Injectable()
 export class BasicAuthGuard implements CanActivate {

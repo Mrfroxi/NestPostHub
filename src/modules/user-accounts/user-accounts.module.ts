@@ -8,11 +8,18 @@ import { UsersQueryRepository } from './infastructure/query/users.query-reposito
 import { Argon2Service } from '../../core/external-service/argon2.service';
 import { AuthController } from './api/auth.controller';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { LocalStrategy } from '../../core/guards/local/local.strategy';
+import { AuthService } from './application/auth.service';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MailerModule,
+    JwtModule.register({
+      secret: process.env.JWT_SECRET || 'secret',
+      signOptions: { expiresIn: '5m' },
+    }),
   ],
   controllers: [UserController, AuthController],
   providers: [
@@ -20,6 +27,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
     UsersRepository,
     UsersQueryRepository,
     Argon2Service,
+    LocalStrategy,
+    AuthService,
   ],
 })
 export class UserAccountsModule {}

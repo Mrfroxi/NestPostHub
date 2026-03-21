@@ -15,7 +15,7 @@ import { CreateUserInputDto } from './input-dto/create-user.input-dto';
 import { UsersQueryRepository } from '../infastructure/query/users.query-repository';
 import { GetUsersQueryParams } from './input-dto/get-users-query.input-dto';
 import { UserOutputDtoDto } from './output/users.output-dto';
-import { BasicAuthGuard } from '../../../core/guards/basic-auth.guard';
+import { BasicAuthGuard } from '../../../core/guards/basic/basic-auth.guard';
 
 @UseGuards(BasicAuthGuard)
 @Controller('users')
