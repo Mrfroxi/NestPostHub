@@ -9,6 +9,7 @@ import { BlogPlatformModule } from './modules/blogPlatform/blog-platform.module'
 import { DomainHttpExceptionsFilter } from './core/exceptions/filters/domain-exceptions.filter';
 import { AllHttpExceptionsFilter } from './core/exceptions/filters/all-exceptions.filter';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { GuardsModule } from './core/guards/guards.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
     UserAccountsModule,
     TestingModule,
     BlogPlatformModule,
+    GuardsModule,
     MailerModule.forRoot({
       transport: {
         host: process.env.EMAIL_HOST,
