@@ -9,7 +9,7 @@ import { BlogPlatformModule } from './modules/blogPlatform/blog-platform.module'
 import { DomainHttpExceptionsFilter } from './core/exceptions/filters/domain-exceptions.filter';
 import { AllHttpExceptionsFilter } from './core/exceptions/filters/all-exceptions.filter';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { GuardsModule } from './core/guards/guards.module';
+import { APP_FILTER } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -18,7 +18,6 @@ import { GuardsModule } from './core/guards/guards.module';
     UserAccountsModule,
     TestingModule,
     BlogPlatformModule,
-    GuardsModule,
     MailerModule.forRoot({
       transport: {
         host: process.env.EMAIL_HOST,
@@ -33,11 +32,11 @@ import { GuardsModule } from './core/guards/guards.module';
   providers: [
     AppService,
     {
-      provide: 'APP_FILTER',
+      provide: APP_FILTER,
       useClass: AllHttpExceptionsFilter,
     },
     {
-      provide: 'APP_FILTER',
+      provide: APP_FILTER,
       useClass: DomainHttpExceptionsFilter,
     },
   ],

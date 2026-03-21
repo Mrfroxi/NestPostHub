@@ -17,6 +17,7 @@ import { GetUsersQueryParams } from './input-dto/get-users-query.input-dto';
 import { UserOutputDtoDto } from './output/users.output-dto';
 import { BasicAuthGuard } from '../../../core/guards/basic-auth.guard';
 
+@UseGuards(BasicAuthGuard)
 @Controller('users')
 export class UserController {
   constructor(
@@ -25,13 +26,11 @@ export class UserController {
   ) {}
 
   @Get()
-  @UseGuards(BasicAuthGuard)
   async getAll(@Query() query: GetUsersQueryParams) {
     return this.userQueryRepository.getAll(query);
   }
 
   @Post()
-  @UseGuards(BasicAuthGuard)
   async createUser(
     @Body() createUserInputDto: CreateUserInputDto,
   ): Promise<UserOutputDtoDto> {
@@ -42,7 +41,6 @@ export class UserController {
   }
 
   @Delete(':id')
-  @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUser(@Param('id') id: string) {
     return this.userService.deleteUser(id);
