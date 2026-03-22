@@ -2,6 +2,16 @@ import { HttpStatus, INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { CreateUserInputDto } from '../../src/modules/user-accounts/api/input-dto/create-user.input-dto';
 import { GLOBAL_PREFIX } from '../../src/setup/global-prefix.setup';
+import supertest from 'supertest';
+
+export interface GetUsersQueryParams {
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
+  pageNumber?: number;
+  pageSize?: number;
+  searchLoginTerm?: string;
+  searchEmailTerm?: string;
+}
 
 export class UsersTestManager {
   constructor(private app: INestApplication) {}
@@ -19,4 +29,25 @@ export class UsersTestManager {
     return response.body;
   }
 
+  async deleteUser(
+    id: string,
+    authToken: { username: string; password: string } = { username: 'admin', password: 'qwerty' },
+    statusCode: number = HttpStatus.NO_CONTENT,
+  ): Promise<supertest.Response> {
+    return request(this.app.getHttpServer())
+      .delete(`/${GLOBAL_PREFIX}/users/${id}`)
+      .auth(authToken.username, authToken.password)
+      .expect(statusCode);
+  }
+
+  async getAllUsers(
+    params: GetUsersQueryParams = {},
+    statusCode: number = HttpStatus.OK,
+  ): Promise<supertest.Response> {
+    return request(this.app.getHttpServer())
+      .get(`/${GLOBAL_PREFIX}/users`)
+      .query(params)
+      .auth('admin', 'qwerty')
+      .expect(statusCode);
+  }
 }
