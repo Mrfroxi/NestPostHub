@@ -11,13 +11,14 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { LocalStrategy } from '../../core/guards/local/local.strategy';
 import { AuthService } from './application/auth.service';
 import { JwtModule } from '@nestjs/jwt';
+import { JwtStrategy } from '../../core/guards/jwt/jwt.strategy';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MailerModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'secret',
+      secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '5m' },
     }),
   ],
@@ -28,6 +29,7 @@ import { JwtModule } from '@nestjs/jwt';
     UsersQueryRepository,
     Argon2Service,
     LocalStrategy,
+    JwtStrategy,
     AuthService,
   ],
 })

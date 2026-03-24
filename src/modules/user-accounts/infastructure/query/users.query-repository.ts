@@ -27,6 +27,19 @@ export class UsersQueryRepository {
     return UserOutputDtoDto.mapToView(user);
   }
 
+  async getByLoginOrNotFoundFail(login: string): Promise<UserOutputDtoDto> {
+    const user: UserDocument | null = await this.UserModel.findOne({
+      login,
+      deletedAt: null,
+    });
+
+    if (!user) {
+      throw new NotFoundException('user not found');
+    }
+
+    return UserOutputDtoDto.mapToView(user);
+  }
+
   async getAll(query: GetUsersQueryParams) {
     const filter: FilterQuery<User> = {
       deletedAt: null,

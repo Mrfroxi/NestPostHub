@@ -1,4 +1,12 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { UserService } from '../application/user.service';
 import { CreateUserInputDto } from './input-dto/create-user.input-dto';
 import {
@@ -9,6 +17,8 @@ import { NewPasswordInputDto } from './input-dto/new-password.input-dto';
 import { PasswordRecoveryInputDto } from './input-dto/password-recovery.input-dto';
 import { LoginInputDto } from './input-dto/login.input-dto';
 import { AuthService } from '../application/auth.service';
+import { JwtAuthGuard } from '../../../core/guards/jwt/jwt-auth.guard';
+import { CurrentUser } from '../../../core/decorators/current-user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -54,6 +64,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @HttpCode(HttpStatus.OK)
   async login(@Body() dto: LoginInputDto) {
     const user = await this.authService.validateUser(
       dto.loginOrEmail,
@@ -61,5 +72,11 @@ export class AuthController {
     );
 
     return this.authService.login(user);
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  async getCurrentUser(@CurrentUser() user: { login: string }) {
+    return this.authService.getCurrentUser(user.login);
   }
 }

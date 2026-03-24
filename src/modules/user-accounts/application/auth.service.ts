@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UsersRepository } from '../infastructure/users.repository';
+import { UsersQueryRepository } from '../infastructure/query/users.query-repository';
 import { Argon2Service } from '../../../core/external-service/argon2.service';
 import { DomainException } from '../../../core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '../../../core/exceptions/domain-exception-codes';
@@ -9,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 export class AuthService {
   constructor(
     private usersRepository: UsersRepository,
+    private usersQueryRepository: UsersQueryRepository,
     private argon2Service: Argon2Service,
     private jwtService: JwtService,
   ) {}
@@ -54,5 +56,16 @@ export class AuthService {
     });
 
     return { accessToken };
+  }
+
+  async getCurrentUser(login: string) {
+    const user =
+      await this.usersQueryRepository.getByLoginOrNotFoundFail(login);
+
+    return {
+      email: user.email,
+      login: user.login,
+      userId: user.id,
+    };
   }
 }
