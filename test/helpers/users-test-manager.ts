@@ -13,6 +13,25 @@ export interface GetUsersQueryParams {
   searchEmailTerm?: string;
 }
 
+export interface RegistrationDto {
+  login: string;
+  email: string;
+  password: string;
+}
+
+export interface LoginDto {
+  loginOrEmail: string;
+  password: string;
+}
+
+export interface ConfirmationCodeDto {
+  code: string;
+}
+
+export interface ResendEmailDto {
+  email: string;
+}
+
 export class UsersTestManager {
   constructor(private app: INestApplication) {}
 
@@ -48,6 +67,56 @@ export class UsersTestManager {
       .get(`/${GLOBAL_PREFIX}/users`)
       .query(params)
       .auth('admin', 'qwerty')
+      .expect(statusCode);
+  }
+
+  async registerUser(
+    dto: RegistrationDto,
+    statusCode: number = HttpStatus.NO_CONTENT,
+  ): Promise<supertest.Response> {
+    return request(this.app.getHttpServer())
+      .post(`/${GLOBAL_PREFIX}/auth/registration`)
+      .send(dto)
+      .expect(statusCode);
+  }
+
+  async confirmRegistration(
+    dto: ConfirmationCodeDto,
+    statusCode: number = HttpStatus.NO_CONTENT,
+  ): Promise<supertest.Response> {
+    return request(this.app.getHttpServer())
+      .post(`/${GLOBAL_PREFIX}/auth/registration-confirmation`)
+      .send(dto)
+      .expect(statusCode);
+  }
+
+  async resendEmailCode(
+    dto: ResendEmailDto,
+    statusCode: number = HttpStatus.NO_CONTENT,
+  ): Promise<supertest.Response> {
+    return request(this.app.getHttpServer())
+      .post(`/${GLOBAL_PREFIX}/auth/registration-email-resending`)
+      .send(dto)
+      .expect(statusCode);
+  }
+
+  async login(
+    dto: LoginDto,
+    statusCode: number = HttpStatus.OK,
+  ): Promise<supertest.Response> {
+    return request(this.app.getHttpServer())
+      .post(`/${GLOBAL_PREFIX}/auth/login`)
+      .send(dto)
+      .expect(statusCode);
+  }
+
+  async getMe(
+    accessToken: string,
+    statusCode: number = HttpStatus.OK,
+  ): Promise<supertest.Response> {
+    return request(this.app.getHttpServer())
+      .get(`/${GLOBAL_PREFIX}/auth/me`)
+      .auth(accessToken, { type: 'bearer' })
       .expect(statusCode);
   }
 }
