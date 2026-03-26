@@ -66,10 +66,6 @@ export class User {
   }
 
   setConfirmationCode(confirmationCode: string) {
-    if (this.confirmationCode) {
-      throw new Error('Entity already confirmationCode');
-    }
-
     this.confirmationCode = confirmationCode;
   }
 

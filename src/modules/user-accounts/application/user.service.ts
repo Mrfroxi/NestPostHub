@@ -119,7 +119,10 @@ export class UserService {
       });
     }
 
-    const confirmationCode: string = userByEmail.getConfirmationCode;
+    const confirmationCode: string = crypto.randomUUID();
+
+    userByEmail.setConfirmationCode(confirmationCode);
+    await this.userRepository.save(userByEmail);
 
     void this.emailService.sendConfirmationEmail(dto.email, confirmationCode);
   }
