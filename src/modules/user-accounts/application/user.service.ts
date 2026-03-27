@@ -144,7 +144,7 @@ export class UserService {
         extensions: [
           {
             message: 'User with the same code not found',
-            field: 'findUserByCode',
+            field: 'code',
           },
         ],
       });
