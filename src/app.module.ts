@@ -13,7 +13,7 @@ import { APP_FILTER } from '@nestjs/core';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({}),
     MongooseModule.forRoot(process.env.MONGO_URI!),
     UserAccountsModule,
     TestingModule,

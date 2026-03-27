@@ -15,9 +15,11 @@ import { JwtStrategy } from '../../core/guards/jwt/jwt.strategy';
 import { Session, SessionSchema } from './domain/session.entity';
 import { SessionRepository } from './infastructure/session.repository';
 import { SessionService } from './application/session.service';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: Session.name, schema: SessionSchema },

@@ -32,7 +32,8 @@ export class AuthController {
   async registerUser(
     @Body() createUserInputDto: CreateUserInputDto,
   ): Promise<void> {
-    await this.userService.registerUser(createUserInputDto);
+    const confirmationCode =
+      await this.userService.registerUser(createUserInputDto);
   }
 
   @Post('registration-email-resending')
