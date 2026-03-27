@@ -26,7 +26,7 @@ import { ConfigModule } from '@nestjs/config';
     ]),
     MailerModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET,
+      secret: process.env.JWT_SECRET_AUTH,
       signOptions: { expiresIn: '5m' },
     }),
   ],

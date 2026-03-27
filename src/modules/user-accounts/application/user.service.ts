@@ -87,7 +87,7 @@ export class UserService {
       from: process.env.NODEMAILER_EMAIL,
       to: dto.email,
       subject: `How to Send Emails with Nodemailer`,
-      text: emailExamples.registrationEmail(confirmationCode),
+      html: emailExamples.registrationEmail(confirmationCode),
     });
   }
 
@@ -124,13 +124,16 @@ export class UserService {
       });
     }
 
-    const confirmationCode: string = userByEmail.getConfirmationCode;
+    const confirmationCode: string = crypto.randomUUID();
+
+    userByEmail.confirmationCode = confirmationCode;
+    await this.userRepository.save(userByEmail);
 
     void this.mailService.sendMail({
       from: process.env.NODEMAILER_EMAIL,
       to: dto.email,
       subject: `How to Send Emails with Nodemailer`,
-      text: emailExamples.registrationEmail(confirmationCode),
+      html: emailExamples.registrationEmail(confirmationCode),
     });
   }
 
@@ -157,7 +160,7 @@ export class UserService {
         extensions: [
           {
             message: 'User with the same code confirmed',
-            field: 'isConfirmed',
+            field: 'code',
           },
         ],
       });
@@ -192,7 +195,7 @@ export class UserService {
       from: process.env.NODEMAILER_EMAIL,
       to: dto.email,
       subject: 'Password Recovery',
-      text: emailExamples.passwordRecoveryEmail(recoveryCode),
+      html: emailExamples.passwordRecoveryEmail(recoveryCode),
     });
   }
 
