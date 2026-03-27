@@ -12,10 +12,16 @@ import { LocalStrategy } from '../../core/guards/local/local.strategy';
 import { AuthService } from './application/auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from '../../core/guards/jwt/jwt.strategy';
+import { Session, SessionSchema } from './domain/session.entity';
+import { SessionRepository } from './infastructure/session.repository';
+import { SessionService } from './application/session.service';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      { name: Session.name, schema: SessionSchema },
+    ]),
     MailerModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
@@ -27,6 +33,8 @@ import { JwtStrategy } from '../../core/guards/jwt/jwt.strategy';
     UserService,
     UsersRepository,
     UsersQueryRepository,
+    SessionService,
+    SessionRepository,
     Argon2Service,
     LocalStrategy,
     JwtStrategy,
