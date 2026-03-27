@@ -18,15 +18,6 @@ import { APP_FILTER } from '@nestjs/core';
     UserAccountsModule,
     TestingModule,
     BlogPlatformModule,
-    MailerModule.forRoot({
-      transport: {
-        host: process.env.EMAIL_HOST,
-        auth: {
-          user: process.env.NODEMAILER_EMAIL,
-          pass: process.env.NODEMAILER_PASS,
-        },
-      },
-    }),
   ],
   controllers: [AppController],
   providers: [

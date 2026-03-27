@@ -5,7 +5,6 @@ import { User, UserDocument } from '../domain/user.entity';
 import type { CreateUserInputDto } from '../api/input-dto/create-user.input-dto';
 import { UsersRepository } from '../infastructure/users.repository';
 import { Argon2Service } from '../../../core/external-service/argon2.service';
-import { MailerService } from '@nestjs-modules/mailer';
 import { DomainException } from '../../../core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '../../../core/exceptions/domain-exception-codes';
 import { emailExamples } from '../../../core/helpers/email-template';
@@ -15,6 +14,7 @@ import {
 } from '../api/input-dto/resendEmail.input.dto';
 import { NewPasswordInputDto } from '../api/input-dto/new-password.input-dto';
 import { PasswordRecoveryInputDto } from '../api/input-dto/password-recovery.input-dto';
+import { EmailService } from '../../notifications/email.service';
 
 @Injectable()
 export class UserService {
@@ -22,7 +22,7 @@ export class UserService {
     @InjectModel(User.name) private UserModel: UserModelType,
     private userRepository: UsersRepository,
     private argon2Service: Argon2Service,
-    private readonly mailService: MailerService,
+    private readonly emailService: EmailService,
   ) {}
 
   async createUser(dto: CreateUserInputDto): Promise<UserDocument> {
@@ -83,12 +83,7 @@ export class UserService {
     createdUser.setConfirmationCode(confirmationCode);
     await this.userRepository.save(createdUser);
 
-    void this.mailService.sendMail({
-      from: process.env.NODEMAILER_EMAIL,
-      to: dto.email,
-      subject: `How to Send Emails with Nodemailer`,
-      text: emailExamples.registrationEmail(confirmationCode),
-    });
+    void this.emailService.sendConfirmationEmail(dto.email, confirmationCode);
   }
 
   async deleteUser(id: string) {
@@ -126,12 +121,7 @@ export class UserService {
 
     const confirmationCode: string = userByEmail.getConfirmationCode;
 
-    void this.mailService.sendMail({
-      from: process.env.NODEMAILER_EMAIL,
-      to: dto.email,
-      subject: `How to Send Emails with Nodemailer`,
-      text: emailExamples.registrationEmail(confirmationCode),
-    });
+    void this.emailService.sendConfirmationEmail(dto.email, confirmationCode);
   }
 
   async confirmationUser(dto: ConfirmationCodeInputDto): Promise<void> {
@@ -188,12 +178,7 @@ export class UserService {
     userByEmail.setRecoveryCode(recoveryCode);
     await this.userRepository.save(userByEmail);
 
-    void this.mailService.sendMail({
-      from: process.env.NODEMAILER_EMAIL,
-      to: dto.email,
-      subject: 'Password Recovery',
-      text: emailExamples.passwordRecoveryEmail(recoveryCode),
-    });
+    void this.emailService.sendRecoveryPassword(dto.email, recoveryCode);
   }
 
   async newPassword(dto: NewPasswordInputDto): Promise<void> {
