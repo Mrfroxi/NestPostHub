@@ -144,7 +144,11 @@ describe('blogs', () => {
 
       await blogsTestManager.updateBlog(
         fakeBlogId,
-        { name: 'Updated' },
+        {
+          name: 'Valid Name',
+          description: 'Valid Description',
+          websiteUrl: 'https://valid.com',
+        },
         404
       );
     });

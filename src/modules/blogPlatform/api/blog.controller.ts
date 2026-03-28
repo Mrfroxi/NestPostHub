@@ -15,7 +15,7 @@ import { BlogService } from '../application/blog.service';
 import { CreateBlogInputDto } from './dto/input/create-blog.input.dto';
 import { BlogQueryRepository } from '../infastructure/query/blog.query.repository';
 import { GetBlogsQueryInputDto } from './dto/input/get-blogs-query.input-dto';
-import { type UpdateBlogDto } from '../domain/dto/update-blog.dto';
+import { UpdateBlogDto } from '../domain/dto/update-blog.dto';
 import { type CreatePostByBlog } from '../domain/dto/create-post.dto';
 import { PostService } from '../application/post.service';
 import { PostQueryRepository } from '../infastructure/query/post.query.repository';

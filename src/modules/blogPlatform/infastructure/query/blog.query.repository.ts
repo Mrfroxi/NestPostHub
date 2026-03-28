@@ -10,6 +10,8 @@ import { BlogOutputDto } from '../../api/dto/output/blog.output-dto';
 import { GetBlogsQueryInputDto } from '../../api/dto/input/get-blogs-query.input-dto';
 import { FilterQuery } from 'mongoose';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
+import { DomainException } from '../../../../core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
 
 @Injectable()
 export class BlogQueryRepository {
@@ -66,7 +68,10 @@ export class BlogQueryRepository {
     });
 
     if (!blog) {
-      throw new NotFoundException();
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        extensions: [{ message: 'blog not found', field: 'blog' }],
+      });
     }
 
     return BlogOutputDto.mapToOut(blog);
