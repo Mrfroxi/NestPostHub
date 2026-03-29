@@ -25,6 +25,7 @@ export class UserController {
   ) {}
 
   @Get()
+  @UseGuards(BasicAuthGuard)
   async getAll(@Query() query: GetUsersQueryParams) {
     return this.userQueryRepository.getAll(query);
   }
