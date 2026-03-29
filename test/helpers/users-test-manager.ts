@@ -32,6 +32,15 @@ export interface ResendEmailDto {
   email: string;
 }
 
+export interface PasswordRecoveryDto {
+  email: string;
+}
+
+export interface NewPasswordDto {
+  recoveryCode: string;
+  newPassword: string;
+}
+
 export class UsersTestManager {
   constructor(private app: INestApplication) {}
 
@@ -117,6 +126,26 @@ export class UsersTestManager {
     return request(this.app.getHttpServer())
       .get(`/${GLOBAL_PREFIX}/auth/me`)
       .auth(accessToken, { type: 'bearer' })
+      .expect(statusCode);
+  }
+
+  async passwordRecovery(
+    dto: PasswordRecoveryDto,
+    statusCode: number = HttpStatus.NO_CONTENT,
+  ): Promise<supertest.Response> {
+    return request(this.app.getHttpServer())
+      .post(`/${GLOBAL_PREFIX}/auth/password-recovery`)
+      .send(dto)
+      .expect(statusCode);
+  }
+
+  async newPassword(
+    dto: NewPasswordDto,
+    statusCode: number = HttpStatus.NO_CONTENT,
+  ): Promise<supertest.Response> {
+    return request(this.app.getHttpServer())
+      .post(`/${GLOBAL_PREFIX}/auth/new-password`)
+      .send(dto)
       .expect(statusCode);
   }
 }

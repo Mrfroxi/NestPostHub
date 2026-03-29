@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { UsersRepository } from '../infastructure/users.repository';
 import { UsersQueryRepository } from '../infastructure/query/users.query-repository';
 import { Argon2Service } from '../../../core/external-service/argon2.service';
 import { DomainException } from '../../../core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '../../../core/exceptions/domain-exception-codes';
 import { JwtService } from '@nestjs/jwt';
+import { ACCESS_TOKEN_STRATEGY_INJECT_TOKEN } from '../constants/auth-tokens.inject-constants';
 
 @Injectable()
 export class AuthService {
@@ -12,6 +13,7 @@ export class AuthService {
     private usersRepository: UsersRepository,
     private usersQueryRepository: UsersQueryRepository,
     private argon2Service: Argon2Service,
+    @Inject(ACCESS_TOKEN_STRATEGY_INJECT_TOKEN)
     private jwtService: JwtService,
   ) {}
 

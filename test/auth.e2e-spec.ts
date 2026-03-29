@@ -24,16 +24,9 @@ describe('auth', () => {
         .useValue(
           new JwtService({
             secret: 'access-token-secret',
-            signOptions: { expiresIn: '2s' },
+            signOptions: { expiresIn: '1m' },
           }),
         )
-        .overrideProvider(REFRESH_TOKEN_STRATEGY_INJECT_TOKEN)
-        .useValue(
-          new JwtService({
-            secret: 'refresh-token-secret',
-            signOptions: { expiresIn: '10m' },
-          }),
-        ),
     );
     app = result.app;
     userTestManger = result.userTestManger;
@@ -186,6 +179,163 @@ describe('auth', () => {
       await savedUser.save();
 
       await userTestManger.resendEmailCode({ email: validRegistrationData.email }, 400);
+    });
+  });
+
+  describe('POST /auth/login', () => {
+    const validRegistrationData = {
+      login: 'testuser',
+      email: 'test@example.com',
+      password: 'password123',
+    };
+
+    it('should login with login and password', async () => {
+      const user = await userTestManger.registerUser(validRegistrationData);
+
+      const response = await userTestManger.login({
+        loginOrEmail: validRegistrationData.login,
+        password: validRegistrationData.password,
+      });
+
+      expect(response.body.accessToken).toBeDefined();
+      expect(typeof response.body.accessToken).toBe('string');
+    });
+
+
+    it('should return 400 if login not found', async () => {
+      await userTestManger.login(
+        { loginOrEmail: 'notfound', password: 'password123' },
+        401
+      );
+    });
+
+    it('should return 400 if password is wrong', async () => {
+      await userTestManger.registerUser(validRegistrationData);
+
+      await userTestManger.login(
+        { loginOrEmail: validRegistrationData.login, password: 'wrongpassword' },
+        401
+      );
+    });
+
+    it('should return 400 if login is empty', async () => {
+      await userTestManger.login({ loginOrEmail: '', password: 'password123' }, 400);
+    });
+
+    it('should return 400 if password is empty', async () => {
+      await userTestManger.login({ loginOrEmail: 'test', password: '' }, 400);
+    });
+  });
+
+  describe('POST /auth/password-recovery', () => {
+    const validRegistrationData = {
+      login: 'testuser',
+      email: 'test@example.com',
+      password: 'password123',
+    };
+
+    it('should send password recovery email', async () => {
+      await userTestManger.registerUser(validRegistrationData);
+
+      await userTestManger.passwordRecovery({ email: validRegistrationData.email });
+
+      const user = await userModel.findOne({ email: validRegistrationData.email });
+      expect(user.recoveryCode).toBeDefined();
+      expect(user.recoveryCode).not.toBe('');
+    });
+
+    it('should return 400 even if email not found', async () => {
+      await userTestManger.passwordRecovery({ email: 'notfound@example.com' },400);
+    });
+
+    it('should return 400 if email is invalid', async () => {
+      await userTestManger.passwordRecovery({ email: 'invalid-email' }, 400);
+    });
+  });
+
+  describe('POST /auth/new-password', () => {
+    const validRegistrationData = {
+      login: 'testuser',
+      email: 'test@example.com',
+      password: 'password123',
+    };
+
+    it('should set new password with valid recovery code', async () => {
+      await userTestManger.registerUser(validRegistrationData);
+      await userTestManger.passwordRecovery({ email: validRegistrationData.email });
+
+      const user = await userModel.findOne({ email: validRegistrationData.email });
+      const recoveryCode = user.recoveryCode;
+
+      await userTestManger.newPassword({
+        recoveryCode,
+        newPassword: 'newPassword123',
+      });
+
+      // Try login with new password
+      const loginResponse = await userTestManger.login({
+        loginOrEmail: validRegistrationData.email,
+        password: 'newPassword123',
+      });
+
+      expect(loginResponse.body.accessToken).toBeDefined();
+    });
+
+    it('should return 400 if recovery code is invalid', async () => {
+      await userTestManger.newPassword(
+        { recoveryCode: 'invalid-code', newPassword: 'newPassword123' },
+        400
+      );
+    });
+
+    it('should return 400 if new password is too short', async () => {
+      await userTestManger.registerUser(validRegistrationData);
+      await userTestManger.passwordRecovery({ email: validRegistrationData.email });
+
+      const user = await userModel.findOne({ email: validRegistrationData.email });
+      const recoveryCode = user.recoveryCode;
+
+      await userTestManger.newPassword(
+        { recoveryCode, newPassword: '123' },
+        400
+      );
+    });
+  });
+
+  describe('GET /auth/me', () => {
+    const validRegistrationData = {
+      login: 'testuser',
+      email: 'test@example.com',
+      password: 'password123',
+    };
+
+    it('should return current user info', async () => {
+      await userTestManger.registerUser(validRegistrationData);
+
+      // Login to get token
+      const loginResponse = await userTestManger.login({
+        loginOrEmail: validRegistrationData.email,
+        password: validRegistrationData.password,
+      });
+
+      const accessToken = loginResponse.body.accessToken;
+
+      console.log(accessToken);
+      const response = await userTestManger.getMe(accessToken);
+
+      expect(response.body).toEqual({
+        email: validRegistrationData.email,
+        login: validRegistrationData.login,
+        userId: expect.any(String),
+      });
+    });
+
+    it('should return 401 without token', async () => {
+      await userTestManger.getMe('', 401);
+    });
+
+    it('should return 401 with invalid token', async () => {
+      await userTestManger.getMe('invalid-token', 401);
     });
   });
 });
