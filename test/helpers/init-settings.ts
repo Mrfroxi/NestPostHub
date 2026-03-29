@@ -7,6 +7,7 @@ import { UsersTestManager } from './users-test-manager';
 import { deleteAllData } from './delete-all-data';
 import { EmailService } from '../../src/modules/notifications/email.service';
 import { EmailServiceMock } from '../mock/email-service.mock';
+import { ConfigModule } from '@nestjs/config';
 
 
 export const initSettings = async (

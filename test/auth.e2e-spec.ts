@@ -23,10 +23,10 @@ describe('auth', () => {
         .overrideProvider(ACCESS_TOKEN_STRATEGY_INJECT_TOKEN)
         .useValue(
           new JwtService({
-            secret: 'access-token-secret',
+            secret: process.env.JWT_SECRET_AUTH,
             signOptions: { expiresIn: '1m' },
           }),
-        )
+        ),
     );
     app = result.app;
     userTestManger = result.userTestManger;
@@ -312,7 +312,6 @@ describe('auth', () => {
     it('should return current user info', async () => {
       await userTestManger.registerUser(validRegistrationData);
 
-      // Login to get token
       const loginResponse = await userTestManger.login({
         loginOrEmail: validRegistrationData.email,
         password: validRegistrationData.password,
@@ -321,6 +320,7 @@ describe('auth', () => {
       const accessToken = loginResponse.body.accessToken;
 
       console.log(accessToken);
+      console.log(process.env);
       const response = await userTestManger.getMe(accessToken);
 
       expect(response.body).toEqual({

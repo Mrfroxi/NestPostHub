@@ -8,7 +8,6 @@ import { TestingModule } from './modules/testing/testing.module';
 import { BlogPlatformModule } from './modules/blogPlatform/blog-platform.module';
 import { DomainHttpExceptionsFilter } from './core/exceptions/filters/domain-exceptions.filter';
 import { AllHttpExceptionsFilter } from './core/exceptions/filters/all-exceptions.filter';
-import { MailerModule } from '@nestjs-modules/mailer';
 import { APP_FILTER } from '@nestjs/core';
 
 @Module({
