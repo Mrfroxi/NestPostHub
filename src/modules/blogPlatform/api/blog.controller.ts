@@ -9,6 +9,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { BlogService } from '../application/blog.service';
 import { CreateBlogInputDto } from './dto/input/create-blog.input.dto';
@@ -20,8 +21,11 @@ import { PostService } from '../application/post.service';
 import { PostQueryRepository } from '../infastructure/query/post.query.repository';
 import { GetPostsQueryInputDto } from './dto/input/get-posts-query.input-dto';
 import { BlogDocument } from '../domain/blog.entity';
+import { BasicAuthGuard } from '../../../core/guards/basic/basic-auth.guard';
+import { Public } from '../../../core/decorators/public.decorator';
 
 @Controller('blogs')
+@UseGuards(BasicAuthGuard)
 export class BlogController {
   constructor(
     private readonly blogService: BlogService,
@@ -30,6 +34,7 @@ export class BlogController {
     private readonly postQueryRepository: PostQueryRepository,
   ) {}
 
+  @Public()
   @Get()
   async getAllBlogs(@Query() query: GetBlogsQueryInputDto) {
     return this.blogQueryRepository.getAll(query);
@@ -59,6 +64,7 @@ export class BlogController {
     return this.postQueryRepository.findOrNotFoundFail(postId);
   }
 
+  @Public()
   @Get(':blogId/posts')
   async getPostByBlog(
     @Param('blogId') blogId: string,
@@ -67,6 +73,7 @@ export class BlogController {
     return this.postQueryRepository.getAll(query, blogId);
   }
 
+  @Public()
   @Get(':id')
   async getById(@Param('id') id: string) {
     return this.blogQueryRepository.getById(id);
