@@ -90,7 +90,10 @@ export class PostQueryRepository {
     });
 
     if (!post) {
-      throw new NotFoundException();
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        extensions: [{ message: 'post not found', field: 'post' }],
+      });
     }
 
     return PostOutputDto.mapToOut(post);

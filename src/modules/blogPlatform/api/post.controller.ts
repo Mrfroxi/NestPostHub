@@ -9,19 +9,23 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { PostService } from '../application/post.service';
 import { CreatePostInputDto } from './dto/input/create-post.input.dto';
 import { PostQueryRepository } from '../infastructure/query/post.query.repository';
 import { GetPostsQueryInputDto } from './dto/input/get-posts-query.input-dto';
-import { type UpdatePostDto } from '../domain/dto/update-post.dto';
+import { UpdatePostDto } from '../domain/dto/update-post.dto';
 import { CommentService } from '../application/comment.service';
 import { CommentQueryRepository } from '../infastructure/query/comment.query.repository';
 import { type CreateCommentByPostDto } from '../domain/dto/create-comment.dto';
 import { GetCommentsQueryInputDto } from './dto/input/get-comments-query.input-dto';
 import { BlogService } from '../application/blog.service';
 import { BlogDocument } from '../domain/blog.entity';
+import { BasicAuthGuard } from '../../../core/guards/basic/basic-auth.guard';
+import { Public } from '../../../core/decorators/public.decorator';
 
+@UseGuards(BasicAuthGuard)
 @Controller('posts')
 export class PostController {
   constructor(
@@ -31,7 +35,7 @@ export class PostController {
     private readonly commentQueryRepository: CommentQueryRepository,
     private readonly blogService: BlogService,
   ) {}
-
+  @Public()
   @Get()
   async getAllPosts(@Query() query: GetPostsQueryInputDto) {
     return this.postQueryRepository.getAll(query);
@@ -50,7 +54,7 @@ export class PostController {
 
     return this.postQueryRepository.findOrNotFoundFail(postId);
   }
-
+  @Public()
   @Get(':id')
   async getById(@Param('id') id: string) {
     return this.postQueryRepository.getById(id);
@@ -80,7 +84,7 @@ export class PostController {
 
     return this.commentQueryRepository.getById(commentId);
   }
-
+  @Public()
   @Get(':postId/comments')
   async getCommentsByPost(
     @Param('postId') postId: string,
