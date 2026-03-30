@@ -4,6 +4,7 @@ import { Connection } from 'mongoose';
 import { appSetup } from '../../src/setup/app.setup';
 import { AppModule } from '../../src/app.module';
 import { UsersTestManager } from './users-test-manager';
+import { BlogsTestManager } from './blogs-test-manager';
 import { deleteAllData } from './delete-all-data';
 import { EmailService } from '../../src/modules/notifications/email.service';
 import { EmailServiceMock } from '../mock/email-service.mock';
@@ -35,6 +36,7 @@ export const initSettings = async (
   const databaseConnection = app.get<Connection>(getConnectionToken());
   const httpServer = app.getHttpServer();
   const userTestManger = new UsersTestManager(app);
+  const blogsTestManager = new BlogsTestManager(app);
 
   await deleteAllData(app);
 
@@ -43,5 +45,6 @@ export const initSettings = async (
     databaseConnection,
     httpServer,
     userTestManger,
+    blogsTestManager,
   };
 };

@@ -9,7 +9,7 @@ import { Argon2Service } from '../../core/external-service/argon2.service';
 import { AuthController } from './api/auth.controller';
 import { LocalStrategy } from '../../core/guards/local/local.strategy';
 import { AuthService } from './application/auth.service';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 import { JwtStrategy } from '../../core/guards/jwt/jwt.strategy';
 import { Session, SessionSchema } from './domain/session.entity';
 import { SessionRepository } from './infastructure/session.repository';
