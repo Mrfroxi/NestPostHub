@@ -15,6 +15,14 @@ export interface CreatePostDto {
   content: string;
 }
 
+export interface GetBlogsQueryParams {
+  searchNameTerm?: string;
+  sortBy?: string;
+  sortDirection?: 'asc' | 'desc';
+  pageNumber?: number;
+  pageSize?: number;
+}
+
 export interface GetPostsQueryParams {
   sortBy?: string;
   sortDirection?: 'asc' | 'desc';
@@ -31,7 +39,49 @@ export class BlogsTestManager {
   ): Promise<supertest.Response> {
     return request(this.app.getHttpServer())
       .post(`/${GLOBAL_PREFIX}/blogs`)
+      .auth('admin', 'qwerty')
       .send(dto)
+      .expect(statusCode);
+  }
+
+  async getAllBlogs(
+    params: GetBlogsQueryParams = {},
+    statusCode: number = HttpStatus.OK,
+  ): Promise<supertest.Response> {
+    return request(this.app.getHttpServer())
+      .get(`/${GLOBAL_PREFIX}/blogs`)
+      .query(params)
+      .expect(statusCode);
+  }
+
+  async getBlogById(
+    id: string,
+    statusCode: number = HttpStatus.OK,
+  ): Promise<supertest.Response> {
+    return request(this.app.getHttpServer())
+      .get(`/${GLOBAL_PREFIX}/blogs/${id}`)
+      .expect(statusCode);
+  }
+
+  async updateBlog(
+    id: string,
+    dto: Partial<CreateBlogDto>,
+    statusCode: number = HttpStatus.NO_CONTENT,
+  ): Promise<supertest.Response> {
+    return request(this.app.getHttpServer())
+      .put(`/${GLOBAL_PREFIX}/blogs/${id}`)
+      .auth('admin', 'qwerty')
+      .send(dto)
+      .expect(statusCode);
+  }
+
+  async deleteBlog(
+    id: string,
+    statusCode: number = HttpStatus.NO_CONTENT,
+  ): Promise<supertest.Response> {
+    return request(this.app.getHttpServer())
+      .delete(`/${GLOBAL_PREFIX}/blogs/${id}`)
+      .auth('admin', 'qwerty')
       .expect(statusCode);
   }
 
@@ -42,6 +92,7 @@ export class BlogsTestManager {
   ): Promise<supertest.Response> {
     return request(this.app.getHttpServer())
       .post(`/${GLOBAL_PREFIX}/blogs/${blogId}/posts`)
+      .auth('admin', 'qwerty')
       .send(dto)
       .expect(statusCode);
   }
