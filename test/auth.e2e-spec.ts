@@ -319,8 +319,6 @@ describe('auth', () => {
 
       const accessToken = loginResponse.body.accessToken;
 
-      console.log(accessToken);
-      console.log(process.env);
       const response = await userTestManger.getMe(accessToken);
 
       expect(response.body).toEqual({

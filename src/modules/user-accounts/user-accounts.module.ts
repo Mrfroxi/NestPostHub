@@ -29,7 +29,6 @@ import { NotificationsModule } from '../notifications/notifications.module';
       { name: Session.name, schema: SessionSchema },
     ]),
     NotificationsModule,
-    JwtModule,
   ],
   controllers: [UserController, AuthController],
   providers: [
