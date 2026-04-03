@@ -9,6 +9,7 @@ import { BlogPlatformModule } from './modules/blogPlatform/blog-platform.module'
 import { DomainHttpExceptionsFilter } from './core/exceptions/filters/domain-exceptions.filter';
 import { AllHttpExceptionsFilter } from './core/exceptions/filters/all-exceptions.filter';
 import { APP_FILTER } from '@nestjs/core';
+import { CqrsModule } from '@nestjs/cqrs';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { APP_FILTER } from '@nestjs/core';
     UserAccountsModule,
     TestingModule,
     BlogPlatformModule,
+    CqrsModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [

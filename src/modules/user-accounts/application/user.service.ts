@@ -7,7 +7,7 @@ import { UsersRepository } from '../infastructure/users.repository';
 import { Argon2Service } from '../../../core/external-service/argon2.service';
 import { DomainException } from '../../../core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '../../../core/exceptions/domain-exception-codes';
-import { emailExamples } from '../../../core/helpers/email-template';
+
 import {
   ConfirmationCodeInputDto,
   ResendEmailInputDto,
@@ -65,15 +65,15 @@ export class UserService {
     });
   }
 
-  async registerAdminUser(dto: CreateUserInputDto): Promise<string> {
-    const createdUser: UserDocument = await this.createUser(dto);
-
-    createdUser.makeEmailConfirmed();
-
-    await this.userRepository.save(createdUser);
-
-    return createdUser.getId;
-  }
+  // async registerAdminUser(dto: CreateUserInputDto): Promise<string> {
+  //   const createdUser: UserDocument = await this.createUser(dto);
+  //
+  //   createdUser.makeEmailConfirmed();
+  //
+  //   await this.userRepository.save(createdUser);
+  //
+  //   return createdUser.getId;
+  // }
 
   async registerUser(dto: CreateUserInputDto): Promise<void> {
     const createdUser: UserDocument = await this.createUser(dto);

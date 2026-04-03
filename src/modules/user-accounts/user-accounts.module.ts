@@ -20,6 +20,11 @@ import {
   REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
 } from './constants/auth-tokens.inject-constants';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { UsersFactory } from './application/factories/users-factory';
+import { CreateAdminUserUseCase } from './application/useCases/user/create-user-command';
+import { DeleteUserUseCase } from './application/useCases/user/delete-user-command';
+
+const userCommandHandlers = [CreateAdminUserUseCase, DeleteUserUseCase];
 
 @Module({
   imports: [
@@ -32,6 +37,7 @@ import { NotificationsModule } from '../notifications/notifications.module';
   ],
   controllers: [UserController, AuthController],
   providers: [
+    ...userCommandHandlers,
     {
       provide: ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
       useFactory: (): JwtService => {
@@ -59,6 +65,7 @@ import { NotificationsModule } from '../notifications/notifications.module';
     LocalStrategy,
     JwtStrategy,
     AuthService,
+    UsersFactory,
   ],
 })
 export class UserAccountsModule {}

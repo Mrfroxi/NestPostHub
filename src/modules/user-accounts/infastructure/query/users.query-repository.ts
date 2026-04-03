@@ -9,6 +9,8 @@ import { FilterQuery } from 'mongoose';
 import { GetUsersQueryParams } from '../../api/input-dto/get-users-query.input-dto';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
 import { UserOutputDtoDto } from '../../api/output/users.output-dto';
+import { DomainException } from '../../../../core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
 
 @Injectable()
 export class UsersQueryRepository {
@@ -21,7 +23,15 @@ export class UsersQueryRepository {
     });
 
     if (!user) {
-      throw new NotFoundException('user not found');
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        extensions: [
+          {
+            message: 'User with the same id not found',
+            field: 'id',
+          },
+        ],
+      });
     }
 
     return UserOutputDtoDto.mapToView(user);
