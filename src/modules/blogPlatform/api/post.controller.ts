@@ -11,29 +11,29 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { PostService } from '../application/post.service';
-import { CreatePostInputDto } from './dto/input/create-post.input.dto';
 import { PostQueryRepository } from '../infastructure/query/post.query.repository';
 import { GetPostsQueryInputDto } from './dto/input/get-posts-query.input-dto';
 import { UpdatePostDto } from '../domain/dto/update-post.dto';
-import { CommentService } from '../application/comment.service';
 import { CommentQueryRepository } from '../infastructure/query/comment.query.repository';
 import { type CreateCommentByPostDto } from '../domain/dto/create-comment.dto';
 import { GetCommentsQueryInputDto } from './dto/input/get-comments-query.input-dto';
-import { BlogService } from '../application/blog.service';
-import { BlogDocument } from '../domain/blog.entity';
 import { BasicAuthGuard } from '../../../core/guards/basic/basic-auth.guard';
 import { Public } from '../../../core/decorators/public.decorator';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreatePostInputDto } from './dto/input/create-post.input.dto';
+import { CreatePostCommand } from '../application/useCases/post/create-post-command';
+import { UpdatePostCommand } from '../application/useCases/post/update-post-command';
+import { DeletePostCommand } from '../application/useCases/post/delete-post-command';
+import { CreateCommentCommand } from '../application/useCases/post/create-comment-command';
+import { UserIdParamDto } from '../../user-accounts/api/input-dto/user-id-param.dto';
 
 @UseGuards(BasicAuthGuard)
 @Controller('posts')
 export class PostController {
   constructor(
-    private readonly postService: PostService,
+    private readonly commandBus: CommandBus,
     private readonly postQueryRepository: PostQueryRepository,
-    private readonly commentService: CommentService,
     private readonly commentQueryRepository: CommentQueryRepository,
-    private readonly blogService: BlogService,
   ) {}
   @Public()
   @Get()
@@ -43,14 +43,9 @@ export class PostController {
 
   @Post()
   async create(@Body() createPostDto: CreatePostInputDto) {
-    const blog: BlogDocument = await this.blogService.findById(
-      createPostDto.blogId,
+    const postId: string = await this.commandBus.execute(
+      new CreatePostCommand(createPostDto),
     );
-
-    const postId: string = await this.postService.createPost({
-      ...createPostDto,
-      blogName: blog.getName,
-    });
 
     return this.postQueryRepository.findOrNotFoundFail(postId);
   }
@@ -62,25 +57,27 @@ export class PostController {
 
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    await this.postService.updateById(id, updatePostDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updatePostDto: UpdatePostDto,
+  ): Promise<void> {
+    await this.commandBus.execute(new UpdatePostCommand(id, updatePostDto));
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deletePost(@Param('id') id: string) {
-    await this.postService.deleteById(id);
+  async deletePost(@Param() params: UserIdParamDto): Promise<void> {
+    await this.commandBus.execute(new DeletePostCommand(params.id));
   }
 
   @Post(':postId/comments')
   async createComment(
-    @Param('postId') postId: string,
+    @Param() params: { postId: string },
     @Body() createCommentDto: CreateCommentByPostDto,
   ) {
-    const commentId: string = await this.commentService.createComment({
-      postId,
-      ...createCommentDto,
-    });
+    const commentId: string = await this.commandBus.execute(
+      new CreateCommentCommand(params.postId, createCommentDto),
+    );
 
     return this.commentQueryRepository.getById(commentId);
   }

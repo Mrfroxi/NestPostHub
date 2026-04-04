@@ -15,6 +15,28 @@ import { CommentQueryRepository } from './infastructure/query/comment.query.repo
 import { CommentController } from './api/comment.controller';
 import { CommentService } from './application/comment.service';
 import { CommentRepository } from './infastructure/comment.repository';
+import { CreateBlogUseCase } from './application/useCases/blog/create-blog-command';
+import { UpdateBlogUseCase } from './application/useCases/blog/update-blog-command';
+import { DeleteBlogUseCase } from './application/useCases/blog/delete-blog-command';
+import { CreatePostByBlogUseCase } from './application/useCases/blog/create-post-by-blog-command';
+import { CreatePostUseCase } from './application/useCases/post/create-post-command';
+import { UpdatePostUseCase } from './application/useCases/post/update-post-command';
+import { DeletePostUseCase } from './application/useCases/post/delete-post-command';
+import { CreateCommentUseCase } from './application/useCases/post/create-comment-command';
+
+const blogCommandHandlers = [
+  CreateBlogUseCase,
+  UpdateBlogUseCase,
+  DeleteBlogUseCase,
+  CreatePostByBlogUseCase,
+];
+
+const postCommandHandlers = [
+  CreatePostUseCase,
+  UpdatePostUseCase,
+  DeletePostUseCase,
+  CreateCommentUseCase,
+];
 
 @Module({
   imports: [
@@ -26,6 +48,8 @@ import { CommentRepository } from './infastructure/comment.repository';
   ],
   controllers: [BlogController, PostController, CommentController],
   providers: [
+    ...blogCommandHandlers,
+    ...postCommandHandlers,
     BlogService,
     BlogRepository,
     BlogQueryRepository,

@@ -11,26 +11,28 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { BlogService } from '../application/blog.service';
-import { CreateBlogInputDto } from './dto/input/create-blog.input.dto';
 import { BlogQueryRepository } from '../infastructure/query/blog.query.repository';
 import { GetBlogsQueryInputDto } from './dto/input/get-blogs-query.input-dto';
 import { UpdateBlogDto } from '../domain/dto/update-blog.dto';
 import { type CreatePostByBlog } from '../domain/dto/create-post.dto';
-import { PostService } from '../application/post.service';
 import { PostQueryRepository } from '../infastructure/query/post.query.repository';
 import { GetPostsQueryInputDto } from './dto/input/get-posts-query.input-dto';
-import { BlogDocument } from '../domain/blog.entity';
 import { BasicAuthGuard } from '../../../core/guards/basic/basic-auth.guard';
 import { Public } from '../../../core/decorators/public.decorator';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateBlogInputDto } from './dto/input/create-blog.input.dto';
+import { CreateBlogCommand } from '../application/useCases/blog/create-blog-command';
+import { UpdateBlogCommand } from '../application/useCases/blog/update-blog-command';
+import { DeleteBlogCommand } from '../application/useCases/blog/delete-blog-command';
+import { CreatePostByBlogCommand } from '../application/useCases/blog/create-post-by-blog-command';
+import { UserIdParamDto } from '../../user-accounts/api/input-dto/user-id-param.dto';
 
 @Controller('blogs')
 @UseGuards(BasicAuthGuard)
 export class BlogController {
   constructor(
-    private readonly blogService: BlogService,
+    private readonly commandBus: CommandBus,
     private readonly blogQueryRepository: BlogQueryRepository,
-    private readonly postService: PostService,
     private readonly postQueryRepository: PostQueryRepository,
   ) {}
 
@@ -42,24 +44,22 @@ export class BlogController {
 
   @Post()
   async create(@Body() createBlogDto: CreateBlogInputDto) {
-    const blogId: string = await this.blogService.createBlog(createBlogDto);
+    const blogId: string = await this.commandBus.execute(
+      new CreateBlogCommand(createBlogDto),
+    );
 
     return this.blogQueryRepository.findOrNotFoundFail(blogId);
   }
 
   @Post(':blogId/posts')
   async createPost(
-    @Param('blogId') blogId: string,
+    @Param() params: { blogId: string },
     @Body()
     createPostDto: CreatePostByBlog,
   ) {
-    const blog: BlogDocument = await this.blogService.findById(blogId);
-
-    const postId: string = await this.postService.createPost({
-      blogId,
-      blogName: blog.getName,
-      ...createPostDto,
-    });
+    const postId: string = await this.commandBus.execute(
+      new CreatePostByBlogCommand(params.blogId, createPostDto),
+    );
 
     return this.postQueryRepository.findOrNotFoundFail(postId);
   }
@@ -81,13 +81,16 @@ export class BlogController {
 
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async update(@Param('id') id: string, @Body() updateBlogDto: UpdateBlogDto) {
-    await this.blogService.updateById(id, updateBlogDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateBlogDto: UpdateBlogDto,
+  ): Promise<void> {
+    await this.commandBus.execute(new UpdateBlogCommand(id, updateBlogDto));
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteUser(@Param('id') id: string) {
-    await this.blogService.deleteById(id);
+  async deleteBlog(@Param() params: UserIdParamDto): Promise<void> {
+    await this.commandBus.execute(new DeleteBlogCommand(params.id));
   }
 }
