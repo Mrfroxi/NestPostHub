@@ -23,6 +23,21 @@ import { NotificationsModule } from '../notifications/notifications.module';
 import { UsersFactory } from './application/factories/users-factory';
 import { CreateAdminUserUseCase } from './application/useCases/user/create-user-command';
 import { DeleteUserUseCase } from './application/useCases/user/delete-user-command';
+import { RegisterUserUseCase } from './application/useCases/auth/register-user-command';
+import { ResendEmailUseCase } from './application/useCases/auth/resend-email-command';
+import { ConfirmEmailUseCase } from './application/useCases/auth/confirm-email-command';
+import { PasswordRecoveryUseCase } from './application/useCases/auth/password-recovery-command';
+import { NewPasswordUseCase } from './application/useCases/auth/new-password-command';
+import { LoginUseCase } from './application/useCases/auth/login-command';
+
+const authCommandHandlers = [
+  RegisterUserUseCase,
+  ResendEmailUseCase,
+  ConfirmEmailUseCase,
+  PasswordRecoveryUseCase,
+  NewPasswordUseCase,
+  LoginUseCase,
+];
 
 const userCommandHandlers = [CreateAdminUserUseCase, DeleteUserUseCase];
 
@@ -38,6 +53,7 @@ const userCommandHandlers = [CreateAdminUserUseCase, DeleteUserUseCase];
   controllers: [UserController, AuthController],
   providers: [
     ...userCommandHandlers,
+    ...authCommandHandlers,
     {
       provide: ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
       useFactory: (): JwtService => {
