@@ -8,6 +8,7 @@ export class PostOutputDto {
   blogId: string;
   blogName: string;
   createdAt: Date;
+
   extendedLikesInfo: {
     likesCount: number;
     dislikesCount: number;
@@ -19,7 +20,15 @@ export class PostOutputDto {
     }>;
   };
 
-  static mapToOut(post: PostDocument): PostOutputDto {
+  static mapToOut(
+    post: PostDocument,
+    extendedLikesInfo: {
+      likesCount: number;
+      dislikesCount: number;
+      myStatus: string;
+      newestLikes: Array<{ userId: string; login: string; addedAt: Date }>;
+    },
+  ): PostOutputDto {
     const dto = new this();
     dto.id = post.getId;
     dto.title = post.title;
@@ -28,6 +37,7 @@ export class PostOutputDto {
     dto.blogId = post.blogId;
     dto.blogName = post.blogName;
     dto.createdAt = post.createdAt;
+    dto.extendedLikesInfo = extendedLikesInfo;
 
     return dto;
   }

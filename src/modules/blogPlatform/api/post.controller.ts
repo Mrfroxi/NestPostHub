@@ -29,7 +29,11 @@ import { LikeDislikePostCommand } from '../application/useCases/post/like-dislik
 import { UserIdParamDto } from '../../user-accounts/api/input-dto/user-id-param.dto';
 import { LikeStatusInputDto } from './dto/input/like-status.input.dto';
 import { JwtAuthGuard } from '../../../core/guards/jwt/jwt-auth.guard';
-import { CurrentUser } from '../../../core/decorators/current-user.decorator';
+import {
+  CurrentPublicUser,
+  CurrentUser,
+} from '../../../core/decorators/current-user.decorator';
+import { JwtPublicAuthGuard } from '../../../core/guards/jwt/jwt-public-guard';
 
 @UseGuards(BasicAuthGuard)
 @Controller('posts')
@@ -54,9 +58,13 @@ export class PostController {
     return this.postQueryRepository.findOrNotFoundFail(postId);
   }
   @Public()
+  @UseGuards(JwtPublicAuthGuard)
   @Get(':id')
-  async getById(@Param('id') id: string) {
-    return this.postQueryRepository.getById(id);
+  async getById(
+    @Param('id') id: string,
+    @CurrentPublicUser() user: { userId: string } | null,
+  ) {
+    return this.postQueryRepository.getById(id, user?.userId);
   }
 
   @Put(':id')

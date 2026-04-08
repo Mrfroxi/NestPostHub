@@ -16,6 +16,10 @@ export class UsersRepository {
     });
   }
 
+  async findByIds(ids: string[]): Promise<UserDocument[]> {
+    return this.UserModel.find({ _id: { $in: ids } }).lean();
+  }
+
   async save(user: UserDocument): Promise<void> {
     await user.save();
   }

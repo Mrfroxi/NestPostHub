@@ -28,11 +28,88 @@ export class PostLikeRepository {
   async findLatestLikesByPost(
     postId: string,
     limit: number = 3,
-  ): Promise<PostLikeDocument[]> {
-    return this.PostLikeModel.find({ postId, status: 'Like' })
-      .sort({ createdAt: -1 })
-      .limit(limit)
-      .lean();
+  ): Promise<{ userId: string; login: string; addedAt: Date }[]> {
+    return this.PostLikeModel.aggregate([
+      { $match: { postId, status: 'Like' } },
+      { $sort: { addedAt: -1 } },
+      { $limit: limit },
+      {
+        $lookup: {
+          from: 'users',
+          let: { uid: { $toObjectId: '$userId' } },
+          pipeline: [{ $match: { $expr: { $eq: ['$_id', '$$uid'] } } }],
+          as: 'user',
+        },
+      },
+      { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          _id: 0,
+          userId: 1,
+          login: '$user.login',
+          addedAt: { $ifNull: ['$addedAt', '$createdAt'] },
+        },
+      },
+    ]);
+  }
+
+  async findLatestLikesByPosts(
+    postIds: string[],
+    limit: number = 3,
+  ): Promise<
+    Map<string, Array<{ userId: string; login: string; addedAt: Date }>>
+  > {
+    const result = await this.PostLikeModel.aggregate([
+      { $match: { postId: { $in: postIds }, status: 'Like' } },
+      { $sort: { addedAt: -1 } },
+      {
+        $group: {
+          _id: '$postId',
+          docs: { $push: '$$ROOT' },
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          docs: { $slice: ['$docs', limit] },
+        },
+      },
+      { $unwind: { path: '$docs', preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: 'users',
+          let: { uid: { $toObjectId: '$docs.userId' } },
+          pipeline: [{ $match: { $expr: { $eq: ['$_id', '$$uid'] } } }],
+          as: 'user',
+        },
+      },
+      { $unwind: { path: '$user', preserveNullAndEmptyArrays: true } },
+      {
+        $group: {
+          _id: '$_id',
+          newestLikes: {
+            $push: {
+              userId: '$docs.userId',
+              login: '$user.login',
+              addedAt: {
+                $ifNull: ['$docs.addedAt', '$docs.createdAt'],
+              },
+            },
+          },
+        },
+      },
+    ]);
+
+    const map = new Map<
+      string,
+      Array<{ userId: string; login: string; addedAt: Date }>
+    >();
+    for (const item of result) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      map.set(item._id, item.newestLikes);
+    }
+
+    return map;
   }
 
   async upsert(

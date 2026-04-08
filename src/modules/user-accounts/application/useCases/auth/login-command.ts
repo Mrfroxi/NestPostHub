@@ -64,6 +64,7 @@ export class LoginUseCase implements ICommandHandler<
 
     const accessToken = this.jwtService.sign({
       login: user.login,
+      userId: user.getId,
     });
 
     return { accessToken };

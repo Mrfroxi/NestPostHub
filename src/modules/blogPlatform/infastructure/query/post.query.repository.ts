@@ -10,19 +10,17 @@ import { PostOutputDto } from '../../api/dto/output/post.output-dto';
 import { GetPostsQueryInputDto } from '../../api/dto/input/get-posts-query.input-dto';
 import { FilterQuery } from 'mongoose';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
-import {
-  Blog,
-  BlogDocument,
-  type BlogModelType,
-} from '../../domain/blog.entity';
+import { Blog, type BlogModelType } from '../../domain/blog.entity';
 import { DomainException } from '../../../../core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
+import { PostLikeRepository } from '../post-like.repository';
 
 @Injectable()
 export class PostQueryRepository {
   constructor(
     @InjectModel(Post.name) private PostModel: PostModelType,
     @InjectModel(Blog.name) private BlogModel: BlogModelType,
+    private postLikeRepository: PostLikeRepository,
   ) {}
 
   async findOrNotFoundFail(id: string): Promise<PostOutputDto> {
@@ -35,7 +33,14 @@ export class PostQueryRepository {
       throw new NotFoundException();
     }
 
-    return PostOutputDto.mapToOut(post);
+    const newestLikes = await this.postLikeRepository.findLatestLikesByPost(id);
+
+    return PostOutputDto.mapToOut(post, {
+      likesCount: post.likesCount ?? 0,
+      dislikesCount: post.dislikesCount ?? 0,
+      myStatus: 'None',
+      newestLikes,
+    });
   }
 
   async getAll(
@@ -71,8 +76,17 @@ export class PostQueryRepository {
 
     const totalCount: number = await this.PostModel.countDocuments(filter);
 
+    const postIds = posts.map((p) => p.getId);
+    const likesMap =
+      await this.postLikeRepository.findLatestLikesByPosts(postIds);
+
     const items: PostOutputDto[] = posts.map((post: PostDocument) =>
-      PostOutputDto.mapToOut(post),
+      PostOutputDto.mapToOut(post, {
+        likesCount: post.likesCount ?? 0,
+        dislikesCount: post.dislikesCount ?? 0,
+        myStatus: 'None',
+        newestLikes: likesMap.get(post.getId) ?? [],
+      }),
     );
 
     return PaginatedViewDto.mapToView({
@@ -83,9 +97,9 @@ export class PostQueryRepository {
     });
   }
 
-  async getById(id: string) {
-    const post = await this.PostModel.findOne({
-      _id: id,
+  async getById(postId: string, currentUserId?: string) {
+    const post: PostDocument | null = await this.PostModel.findOne({
+      _id: postId,
       deletedAt: null,
     });
 
@@ -96,6 +110,24 @@ export class PostQueryRepository {
       });
     }
 
-    return PostOutputDto.mapToOut(post);
+    const newestLikes =
+      await this.postLikeRepository.findLatestLikesByPost(postId);
+
+    let myStatus = 'None';
+
+    if (currentUserId) {
+      const userLike = await this.postLikeRepository.findByPostAndUser(
+        postId,
+        currentUserId,
+      );
+      myStatus = userLike?.status ?? 'None';
+    }
+
+    return PostOutputDto.mapToOut(post, {
+      likesCount: post.likesCount ?? 0,
+      dislikesCount: post.dislikesCount ?? 0,
+      myStatus,
+      newestLikes,
+    });
   }
 }
