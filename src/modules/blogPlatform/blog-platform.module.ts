@@ -12,11 +12,16 @@ import { PostRepository } from './infastructure/post.repository';
 import { PostQueryRepository } from './infastructure/query/post.query.repository';
 import { Comment, CommentSchema } from './domain/comment.entity';
 import { PostLike, PostLikeSchema } from './domain/post-like.entity';
+import { CommentLike, CommentLikeSchema } from './domain/comment-like.entity';
 import { CommentQueryRepository } from './infastructure/query/comment.query.repository';
 import { CommentController } from './api/comment.controller';
 import { CommentService } from './application/comment.service';
 import { CommentRepository } from './infastructure/comment.repository';
+import { CommentLikeRepository } from './infastructure/comment-like.repository';
 import { LikeDislikePostUseCase } from './application/useCases/post/like-dislike-post-command';
+import { LikeDislikeCommentUseCase } from './application/useCases/comment/like-dislike-comment-command';
+import { DeleteCommentUseCase } from './application/useCases/comment/delete-comment-command';
+import { UpdateCommentUseCase } from './application/useCases/comment/update-comment-command';
 import { CreateBlogUseCase } from './application/useCases/blog/create-blog-command';
 import { UpdateBlogUseCase } from './application/useCases/blog/update-blog-command';
 import { DeleteBlogUseCase } from './application/useCases/blog/delete-blog-command';
@@ -42,6 +47,9 @@ const postCommandHandlers = [
   DeletePostUseCase,
   CreateCommentUseCase,
   LikeDislikePostUseCase,
+  LikeDislikeCommentUseCase,
+  DeleteCommentUseCase,
+  UpdateCommentUseCase,
 ];
 
 @Module({
@@ -52,6 +60,7 @@ const postCommandHandlers = [
       { name: Post.name, schema: PostSchema },
       { name: Comment.name, schema: CommentSchema },
       { name: PostLike.name, schema: PostLikeSchema },
+      { name: CommentLike.name, schema: CommentLikeSchema },
     ]),
     UserAccountsModule,
   ],
@@ -68,6 +77,7 @@ const postCommandHandlers = [
     CommentService,
     CommentRepository,
     CommentQueryRepository,
+    CommentLikeRepository,
     PostLikeRepository,
   ],
 })

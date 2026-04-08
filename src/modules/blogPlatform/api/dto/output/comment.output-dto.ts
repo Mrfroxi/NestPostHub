@@ -8,13 +8,26 @@ export class CommentOutputDto {
     userLogin: string;
   };
   createdAt: Date;
+  likesInfo: {
+    likesCount: number;
+    dislikesCount: number;
+    myStatus: string;
+  };
 
-  static mapToOut(comment: CommentDocument): CommentOutputDto {
+  static mapToOut(
+    comment: CommentDocument,
+    likesInfo: {
+      likesCount: number;
+      dislikesCount: number;
+      myStatus: string;
+    },
+  ): CommentOutputDto {
     const dto = new this();
     dto.id = comment.getId;
     dto.content = comment.content;
     dto.commentatorInfo = comment.commentatorInfo;
     dto.createdAt = comment.createdAt;
+    dto.likesInfo = likesInfo;
 
     return dto;
   }

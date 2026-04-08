@@ -57,6 +57,7 @@ export class PostController {
 
     return this.postQueryRepository.findOrNotFoundFail(postId);
   }
+
   @Public()
   @UseGuards(JwtPublicAuthGuard)
   @Get(':id')
@@ -82,13 +83,16 @@ export class PostController {
     await this.commandBus.execute(new DeletePostCommand(params.id));
   }
 
+  @Public()
+  @UseGuards(JwtAuthGuard)
   @Post(':postId/comments')
   async createComment(
+    @CurrentUser() user: { userId: string; login: string },
     @Param() params: { postId: string },
     @Body() createCommentDto: CreateCommentByPostDto,
   ) {
     const commentId: string = await this.commandBus.execute(
-      new CreateCommentCommand(params.postId, createCommentDto),
+      new CreateCommentCommand(params.postId, createCommentDto, user),
     );
 
     return this.commentQueryRepository.getById(commentId);

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 
 import {
@@ -13,25 +13,32 @@ import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
 import { DomainException } from '../../../../core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
 import { PostRepository } from '../post.repository';
+import { CommentLikeRepository } from '../comment-like.repository';
 
 @Injectable()
 export class CommentQueryRepository {
   constructor(
     @InjectModel(Comment.name) private CommentModel: CommentModelType,
     private postRepository: PostRepository,
+    private commentLikeRepository: CommentLikeRepository,
   ) {}
 
-  async getById(id: string) {
+  async getById(id: string, currentUserId?: string) {
     const comment = await this.CommentModel.findOne({
       _id: id,
       deletedAt: null,
     });
 
     if (!comment) {
-      throw new NotFoundException();
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        extensions: [{ message: 'comment not found', field: 'comment' }],
+      });
     }
 
-    return CommentOutputDto.mapToOut(comment);
+    const likesInfo = await this.buildLikesInfo(id, currentUserId, comment);
+
+    return CommentOutputDto.mapToOut(comment, likesInfo);
   }
 
   async getAll(query: GetCommentsQueryInputDto, postId: string) {
@@ -58,7 +65,11 @@ export class CommentQueryRepository {
     const totalCount: number = await this.CommentModel.countDocuments(filter);
 
     const items: CommentOutputDto[] = comments.map((comment: CommentDocument) =>
-      CommentOutputDto.mapToOut(comment),
+      CommentOutputDto.mapToOut(comment, {
+        likesCount: comment.likesCount ?? 0,
+        dislikesCount: comment.dislikesCount ?? 0,
+        myStatus: 'None',
+      }),
     );
 
     return PaginatedViewDto.mapToView({
@@ -67,5 +78,27 @@ export class CommentQueryRepository {
       page: query.pageNumber,
       size: query.pageSize,
     });
+  }
+
+  private async buildLikesInfo(
+    commentId: string,
+    currentUserId: string | undefined,
+    comment: CommentDocument,
+  ): Promise<{ likesCount: number; dislikesCount: number; myStatus: string }> {
+    let myStatus = 'None';
+
+    if (currentUserId) {
+      const userLike = await this.commentLikeRepository.findByCommentAndUser(
+        commentId,
+        currentUserId,
+      );
+      myStatus = userLike?.status ?? 'None';
+    }
+
+    return {
+      likesCount: comment.likesCount ?? 0,
+      dislikesCount: comment.dislikesCount ?? 0,
+      myStatus,
+    };
   }
 }

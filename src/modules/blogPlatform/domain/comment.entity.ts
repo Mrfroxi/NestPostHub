@@ -26,6 +26,12 @@ export class Comment {
   @Prop({ type: Date, nullable: true, default: null })
   deletedAt: Date | null;
 
+  @Prop({ type: Number, required: false, default: 0 })
+  likesCount: number;
+
+  @Prop({ type: Number, required: false, default: 0 })
+  dislikesCount: number;
+
   get getId(): string {
     return this._id.toString();
   }
@@ -44,6 +50,13 @@ export class Comment {
       throw new NotFoundException();
     }
     this.deletedAt = new Date();
+  }
+
+  updateContent(content: string) {
+    if (this.deletedAt !== null) {
+      throw new NotFoundException();
+    }
+    this.content = content;
   }
 }
 

@@ -14,7 +14,8 @@ import { DomainExceptionCode } from '../../../../../core/exceptions/domain-excep
 export class CreateCommentCommand {
   constructor(
     public postId: string,
-    public dto: CreateCommentByPostDto,
+    public content: CreateCommentByPostDto,
+    public user: { login: string; userId: string },
   ) {}
 }
 
@@ -29,7 +30,11 @@ export class CreateCommentUseCase implements ICommandHandler<
     private postRepository: PostRepository,
   ) {}
 
-  async execute({ postId, dto }: CreateCommentCommand): Promise<string> {
+  async execute({
+    postId,
+    content,
+    user,
+  }: CreateCommentCommand): Promise<string> {
     const isPost = await this.postRepository.findOrNotFoundFail(postId);
 
     if (!isPost) {
@@ -41,7 +46,11 @@ export class CreateCommentUseCase implements ICommandHandler<
 
     const comment: CommentDocument = this.CommentModel.createInstance({
       postId,
-      ...dto,
+      ...content,
+      commentatorInfo: {
+        userId: user.userId,
+        userLogin: user.login,
+      },
     });
 
     await this.commentRepository.save(comment);
