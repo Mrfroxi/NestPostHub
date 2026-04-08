@@ -10,11 +10,15 @@ import { CommentOutputDto } from '../../api/dto/output/comment.output-dto';
 import { GetCommentsQueryInputDto } from '../../api/dto/input/get-comments-query.input-dto';
 import { FilterQuery } from 'mongoose';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
+import { DomainException } from '../../../../core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
+import { PostRepository } from '../post.repository';
 
 @Injectable()
 export class CommentQueryRepository {
   constructor(
     @InjectModel(Comment.name) private CommentModel: CommentModelType,
+    private postRepository: PostRepository,
   ) {}
 
   async getById(id: string) {
@@ -30,14 +34,21 @@ export class CommentQueryRepository {
     return CommentOutputDto.mapToOut(comment);
   }
 
-  async getAll(query: GetCommentsQueryInputDto, postId?: string) {
+  async getAll(query: GetCommentsQueryInputDto, postId: string) {
     const filter: FilterQuery<Comment> = {
       deletedAt: null,
     };
 
-    if (postId) {
-      filter.postId = postId;
+    const isPost = await this.postRepository.findOrNotFoundFail(postId);
+
+    if (!isPost) {
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        extensions: [{ message: 'post not found', field: 'isPost' }],
+      });
     }
+
+    filter.postId = postId;
 
     const comments: CommentDocument[] = await this.CommentModel.find(filter)
       .sort({ [query.sortBy]: query.sortDirection })

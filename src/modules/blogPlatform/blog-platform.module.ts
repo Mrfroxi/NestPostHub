@@ -11,18 +11,23 @@ import { PostService } from './application/post.service';
 import { PostRepository } from './infastructure/post.repository';
 import { PostQueryRepository } from './infastructure/query/post.query.repository';
 import { Comment, CommentSchema } from './domain/comment.entity';
+import { PostLike, PostLikeSchema } from './domain/post-like.entity';
 import { CommentQueryRepository } from './infastructure/query/comment.query.repository';
 import { CommentController } from './api/comment.controller';
 import { CommentService } from './application/comment.service';
 import { CommentRepository } from './infastructure/comment.repository';
+import { LikeDislikePostUseCase } from './application/useCases/post/like-dislike-post-command';
 import { CreateBlogUseCase } from './application/useCases/blog/create-blog-command';
 import { UpdateBlogUseCase } from './application/useCases/blog/update-blog-command';
 import { DeleteBlogUseCase } from './application/useCases/blog/delete-blog-command';
 import { CreatePostByBlogUseCase } from './application/useCases/blog/create-post-by-blog-command';
-import { CreatePostUseCase } from './application/useCases/post/create-post-command';
 import { UpdatePostUseCase } from './application/useCases/post/update-post-command';
 import { DeletePostUseCase } from './application/useCases/post/delete-post-command';
 import { CreateCommentUseCase } from './application/useCases/post/create-comment-command';
+import { CreatePostUseCase } from './application/useCases/post/create-post-command';
+import { PostLikeRepository } from './infastructure/post-like.repository';
+import { UserAccountsModule } from '../user-accounts/user-accounts.module';
+import { JwtModule } from '@nestjs/jwt';
 
 const blogCommandHandlers = [
   CreateBlogUseCase,
@@ -36,15 +41,19 @@ const postCommandHandlers = [
   UpdatePostUseCase,
   DeletePostUseCase,
   CreateCommentUseCase,
+  LikeDislikePostUseCase,
 ];
 
 @Module({
   imports: [
+    JwtModule,
     MongooseModule.forFeature([
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
       { name: Comment.name, schema: CommentSchema },
+      { name: PostLike.name, schema: PostLikeSchema },
     ]),
+    UserAccountsModule,
   ],
   controllers: [BlogController, PostController, CommentController],
   providers: [
@@ -59,6 +68,7 @@ const postCommandHandlers = [
     CommentService,
     CommentRepository,
     CommentQueryRepository,
+    PostLikeRepository,
   ],
 })
 export class BlogPlatformModule {}

@@ -23,26 +23,19 @@ export class Post {
   @Prop({ type: String, required: true })
   blogName: string;
 
-  @Prop({
-    type: Object,
-    required: true,
-    default: {
-      likesCount: 0,
-      dislikesCount: 0,
-      myStatus: 'None',
-      newestLikes: [],
-    },
-  })
-  extendedLikesInfo: {
-    likesCount: number;
-    dislikesCount: number;
-    myStatus: string;
-    newestLikes: Array<{
-      userId: string;
-      login: string;
-      addedAt: Date;
-    }>;
-  };
+  @Prop({ type: Number, required: false, default: 0 })
+  likesCount: number;
+
+  setLikes(likes: number) {
+    this.likesCount = likes;
+  }
+
+  @Prop({ type: Number, required: false, default: 0 })
+  dislikesCount: number;
+
+  setDisLikes(dislikes: number) {
+    this.dislikesCount = dislikes;
+  }
 
   createdAt: Date;
 
@@ -62,12 +55,6 @@ export class Post {
     post.content = dto.content;
     post.blogId = dto.blogId;
     post.blogName = dto.blogName;
-    post.extendedLikesInfo = {
-      likesCount: 0,
-      dislikesCount: 0,
-      myStatus: 'None',
-      newestLikes: [],
-    };
 
     return post as PostDocument;
   }

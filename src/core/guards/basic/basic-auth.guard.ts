@@ -27,7 +27,9 @@ export class BasicAuthGuard implements CanActivate {
     if (!authHeader || !authHeader.startsWith('Basic ')) {
       throw new DomainException({
         code: DomainExceptionCode.Unauthorized,
-        extensions: [{ message: 'authHeader not found', field: 'authHeader' }],
+        extensions: [
+          { message: 'authBasicHeader not found', field: 'authHeader' },
+        ],
       });
     }
 

@@ -25,7 +25,11 @@ import { CreatePostCommand } from '../application/useCases/post/create-post-comm
 import { UpdatePostCommand } from '../application/useCases/post/update-post-command';
 import { DeletePostCommand } from '../application/useCases/post/delete-post-command';
 import { CreateCommentCommand } from '../application/useCases/post/create-comment-command';
+import { LikeDislikePostCommand } from '../application/useCases/post/like-dislike-post-command';
 import { UserIdParamDto } from '../../user-accounts/api/input-dto/user-id-param.dto';
+import { LikeStatusInputDto } from './dto/input/like-status.input.dto';
+import { JwtAuthGuard } from '../../../core/guards/jwt/jwt-auth.guard';
+import { CurrentUser } from '../../../core/decorators/current-user.decorator';
 
 @UseGuards(BasicAuthGuard)
 @Controller('posts')
@@ -88,5 +92,19 @@ export class PostController {
     @Query() query: GetCommentsQueryInputDto,
   ) {
     return this.commentQueryRepository.getAll(query, postId);
+  }
+
+  @Public()
+  @Put(':postId/like-status')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(JwtAuthGuard)
+  async likeDislikePost(
+    @Param('postId') postId: string,
+    @Body() likeStatusDto: LikeStatusInputDto,
+    @CurrentUser() user: { login: string },
+  ): Promise<void> {
+    await this.commandBus.execute(
+      new LikeDislikePostCommand(postId, user.login, likeStatusDto.likeStatus),
+    );
   }
 }

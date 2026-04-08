@@ -17,3 +17,17 @@ export const CurrentUser = createParamDecorator(
     return user;
   },
 );
+
+export const CurrentPublicUser = createParamDecorator(
+  (data: unknown, context: ExecutionContext): { login: string } | null => {
+    const request = context.switchToHttp().getRequest<RequestWithUser>();
+
+    const user = request.user;
+
+    if (!user) {
+      return null;
+    }
+
+    return user;
+  },
+);

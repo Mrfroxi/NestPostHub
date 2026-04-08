@@ -27,7 +27,6 @@ export class PostOutputDto {
     dto.content = post.content;
     dto.blogId = post.blogId;
     dto.blogName = post.blogName;
-    dto.extendedLikesInfo = post.extendedLikesInfo;
     dto.createdAt = post.createdAt;
 
     return dto;
