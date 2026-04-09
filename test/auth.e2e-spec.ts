@@ -201,6 +201,30 @@ describe('auth', () => {
       expect(typeof response.body.accessToken).toBe('string');
     });
 
+    it('should return refreshToken in cookie and accessToken in body', async () => {
+      await userTestManger.registerUser(validRegistrationData);
+
+      const response = await userTestManger.login({
+        loginOrEmail: validRegistrationData.login,
+        password: validRegistrationData.password,
+      });
+
+      expect(response.body.accessToken).toBeDefined();
+      expect(typeof response.body.accessToken).toBe('string');
+      
+      const setCookieHeader = response.headers['set-cookie'];
+      expect(setCookieHeader).toBeDefined();
+      
+      const refreshTokenCookie = Array.isArray(setCookieHeader)
+        ? setCookieHeader.find((cookie: string) => cookie.startsWith('refreshToken='))
+        : typeof setCookieHeader === 'string'
+          ? (setCookieHeader.startsWith('refreshToken=') ? setCookieHeader : undefined)
+          : undefined;
+      
+      expect(refreshTokenCookie).toBeDefined();
+      expect(refreshTokenCookie).toContain('refreshToken=');
+      expect(refreshTokenCookie).toContain('HttpOnly');
+    });
 
     it('should return 400 if login not found', async () => {
       await userTestManger.login(
