@@ -41,7 +41,11 @@ export class CommentQueryRepository {
     return CommentOutputDto.mapToOut(comment, likesInfo);
   }
 
-  async getAll(query: GetCommentsQueryInputDto, postId: string) {
+  async getAll(
+    query: GetCommentsQueryInputDto,
+    postId: string,
+    currentUserId?: string,
+  ) {
     const filter: FilterQuery<Comment> = {
       deletedAt: null,
     };
@@ -64,12 +68,13 @@ export class CommentQueryRepository {
 
     const totalCount: number = await this.CommentModel.countDocuments(filter);
 
-    const items: CommentOutputDto[] = comments.map((comment: CommentDocument) =>
-      CommentOutputDto.mapToOut(comment, {
-        likesCount: comment.likesCount ?? 0,
-        dislikesCount: comment.dislikesCount ?? 0,
-        myStatus: 'None',
-      }),
+    const items = await Promise.all(
+      comments.map(async (comment: CommentDocument) =>
+        CommentOutputDto.mapToOut(
+          comment,
+          await this.buildLikesInfo(comment.getId, currentUserId, comment),
+        ),
+      ),
     );
 
     return PaginatedViewDto.mapToView({

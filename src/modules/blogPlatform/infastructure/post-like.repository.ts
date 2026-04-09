@@ -25,6 +25,20 @@ export class PostLikeRepository {
     return this.PostLikeModel.findOne({ postId, userId });
   }
 
+  async findByPostsAndUser(
+    postIds: string[],
+    userId: string,
+  ): Promise<Array<{ postId: string; status: LikeStatus }>> {
+    const likes = await this.PostLikeModel.find({
+      postId: { $in: postIds },
+      userId,
+    }).lean();
+    return likes.map((like) => ({
+      postId: like.postId,
+      status: like.status,
+    }));
+  }
+
   async findLatestLikesByPost(
     postId: string,
     limit: number = 3,

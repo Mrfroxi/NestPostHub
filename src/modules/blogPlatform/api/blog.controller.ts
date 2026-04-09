@@ -27,6 +27,8 @@ import { UpdateBlogCommand } from '../application/useCases/blog/update-blog-comm
 import { DeleteBlogCommand } from '../application/useCases/blog/delete-blog-command';
 import { CreatePostByBlogCommand } from '../application/useCases/blog/create-post-by-blog-command';
 import { UserIdParamDto } from '../../user-accounts/api/input-dto/user-id-param.dto';
+import { CurrentPublicUser } from '../../../core/decorators/current-user.decorator';
+import { JwtPublicAuthGuard } from '../../../core/guards/jwt/jwt-public-guard';
 
 @Controller('blogs')
 @UseGuards(BasicAuthGuard)
@@ -65,12 +67,14 @@ export class BlogController {
   }
 
   @Public()
+  @UseGuards(JwtPublicAuthGuard)
   @Get(':blogId/posts')
   async getPostByBlog(
     @Param('blogId') blogId: string,
     @Query() query: GetPostsQueryInputDto,
+    @CurrentPublicUser() user: { userId: string } | null,
   ) {
-    return this.postQueryRepository.getAll(query, blogId);
+    return this.postQueryRepository.getAll(query, user?.userId, blogId);
   }
 
   @Public()

@@ -39,7 +39,6 @@ import {
 import { JwtPublicAuthGuard } from '../../../core/guards/jwt/jwt-public-guard';
 import { postParamId } from './dto/input/get-id-param';
 
-@UseGuards(BasicAuthGuard)
 @Controller('posts')
 export class PostController {
   constructor(
@@ -47,12 +46,17 @@ export class PostController {
     private readonly postQueryRepository: PostQueryRepository,
     private readonly commentQueryRepository: CommentQueryRepository,
   ) {}
-  @Public()
+
+  @UseGuards(JwtPublicAuthGuard)
   @Get()
-  async getAllPosts(@Query() query: GetPostsQueryInputDto) {
-    return this.postQueryRepository.getAll(query);
+  async getAllPosts(
+    @Query() query: GetPostsQueryInputDto,
+    @CurrentPublicUser() user: { userId: string } | null,
+  ) {
+    return this.postQueryRepository.getAll(query, user?.userId);
   }
 
+  @UseGuards(BasicAuthGuard)
   @Post()
   async create(@Body() createPostDto: CreatePostInputDto) {
     const postId: string = await this.commandBus.execute(
@@ -62,7 +66,6 @@ export class PostController {
     return this.postQueryRepository.findOrNotFoundFail(postId);
   }
 
-  @Public()
   @UseGuards(JwtPublicAuthGuard)
   @Get(':id')
   async getById(
@@ -72,6 +75,7 @@ export class PostController {
     return this.postQueryRepository.getById(id, user?.userId);
   }
 
+  @UseGuards(BasicAuthGuard)
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async update(
@@ -81,13 +85,13 @@ export class PostController {
     await this.commandBus.execute(new UpdatePostCommand(id, updatePostDto));
   }
 
+  @UseGuards(BasicAuthGuard)
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePost(@Param() params: UserIdParamDto): Promise<void> {
     await this.commandBus.execute(new DeletePostCommand(params.id));
   }
 
-  @Public()
   @UseGuards(JwtAuthGuard)
   @Post(':postId/comments')
   async createComment(
@@ -101,16 +105,18 @@ export class PostController {
 
     return this.commentQueryRepository.getById(commentId);
   }
+
   @Public()
+  @UseGuards(JwtPublicAuthGuard)
   @Get(':postId/comments')
   async getCommentsByPost(
     @Param('postId') postId: string,
     @Query() query: GetCommentsQueryInputDto,
+    @CurrentPublicUser() user: { userId: string } | null,
   ) {
-    return this.commentQueryRepository.getAll(query, postId);
+    return this.commentQueryRepository.getAll(query, postId, user?.userId);
   }
 
-  @Public()
   @Put(':postId/like-status')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)

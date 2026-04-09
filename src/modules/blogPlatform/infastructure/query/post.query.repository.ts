@@ -10,10 +10,10 @@ import { PostOutputDto } from '../../api/dto/output/post.output-dto';
 import { GetPostsQueryInputDto } from '../../api/dto/input/get-posts-query.input-dto';
 import { FilterQuery } from 'mongoose';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
-import { Blog, type BlogModelType } from '../../domain/blog.entity';
 import { DomainException } from '../../../../core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '../../../../core/exceptions/domain-exception-codes';
 import { PostLikeRepository } from '../post-like.repository';
+import { Blog, type BlogModelType } from '../../domain/blog.entity';
 
 @Injectable()
 export class PostQueryRepository {
@@ -45,8 +45,13 @@ export class PostQueryRepository {
 
   async getAll(
     query: GetPostsQueryInputDto,
+    currentUserId?: string,
     blogId?: string,
   ): Promise<PaginatedViewDto<PostOutputDto[]>> {
+    const filter: FilterQuery<Post> = {
+      deletedAt: null,
+    };
+
     if (blogId) {
       const blog = await this.BlogModel.findOne({
         _id: blogId,
@@ -56,16 +61,10 @@ export class PostQueryRepository {
       if (!blog) {
         throw new DomainException({
           code: DomainExceptionCode.NotFound,
-          extensions: [{ message: 'blog not found', field: 'blog' }],
+          extensions: [{ message: 'blog not found', field: 'blogId' }],
         });
       }
-    }
 
-    const filter: FilterQuery<Post> = {
-      deletedAt: null,
-    };
-
-    if (blogId) {
       filter.blogId = blogId;
     }
 
@@ -77,14 +76,26 @@ export class PostQueryRepository {
     const totalCount: number = await this.PostModel.countDocuments(filter);
 
     const postIds = posts.map((p) => p.getId);
+
     const likesMap =
       await this.postLikeRepository.findLatestLikesByPosts(postIds);
+
+    const userLikesMap: Map<string, string> = new Map();
+    if (currentUserId && postIds.length > 0) {
+      const userLikes = await this.postLikeRepository.findByPostsAndUser(
+        postIds,
+        currentUserId,
+      );
+      for (const like of userLikes) {
+        userLikesMap.set(like.postId, like.status);
+      }
+    }
 
     const items: PostOutputDto[] = posts.map((post: PostDocument) =>
       PostOutputDto.mapToOut(post, {
         likesCount: post.likesCount ?? 0,
         dislikesCount: post.dislikesCount ?? 0,
-        myStatus: 'None',
+        myStatus: userLikesMap.get(post.getId) ?? 'None',
         newestLikes: likesMap.get(post.getId) ?? [],
       }),
     );
