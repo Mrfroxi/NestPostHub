@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectModel } from '@nestjs/mongoose';
-import { CreatePostByBlog } from '../../../domain/dto/create-post.dto';
+import { CreatePostByBlogDto } from '../../../api/dto/input/create-post-by-blog.input.dto';
 import { BlogDocument } from '../../../domain/blog.entity';
 import {
   Post,
@@ -15,7 +15,7 @@ import { DomainExceptionCode } from '../../../../../core/exceptions/domain-excep
 export class CreatePostByBlogCommand {
   constructor(
     public blogId: string,
-    public dto: CreatePostByBlog,
+    public dto: CreatePostByBlogDto,
   ) {}
 }
 

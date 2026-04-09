@@ -14,7 +14,8 @@ import {
 import { BlogQueryRepository } from '../infastructure/query/blog.query.repository';
 import { GetBlogsQueryInputDto } from './dto/input/get-blogs-query.input-dto';
 import { UpdateBlogDto } from '../domain/dto/update-blog.dto';
-import { type CreatePostByBlog } from '../domain/dto/create-post.dto';
+import { CreatePostInputDto } from './dto/input/create-post.input.dto';
+import { CreatePostByBlogDto } from './dto/input/create-post-by-blog.input.dto';
 import { PostQueryRepository } from '../infastructure/query/post.query.repository';
 import { GetPostsQueryInputDto } from './dto/input/get-posts-query.input-dto';
 import { BasicAuthGuard } from '../../../core/guards/basic/basic-auth.guard';
@@ -53,12 +54,11 @@ export class BlogController {
 
   @Post(':blogId/posts')
   async createPost(
-    @Param() params: { blogId: string },
-    @Body()
-    createPostDto: CreatePostByBlog,
+    @Param('blogId') blogId: string,
+    @Body() createPostDto: CreatePostByBlogDto,
   ) {
     const postId: string = await this.commandBus.execute(
-      new CreatePostByBlogCommand(params.blogId, createPostDto),
+      new CreatePostByBlogCommand(blogId, createPostDto),
     );
 
     return this.postQueryRepository.findOrNotFoundFail(postId);

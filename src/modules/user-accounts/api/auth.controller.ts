@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { CreateUserInputDto } from './input-dto/create-user.input-dto';
@@ -28,6 +29,7 @@ import {
   LoginResult,
 } from '../application/useCases/auth/login-command';
 import { AuthService } from '../application/auth.service';
+import type { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -76,8 +78,22 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() dto: LoginInputDto): Promise<LoginResult> {
-    return this.commandBus.execute(new LoginCommand(dto));
+  async login(
+    @Body() dto: LoginInputDto,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<{ accessToken: string }> {
+    const result: LoginResult = await this.commandBus.execute(
+      new LoginCommand(dto),
+    );
+
+    res.cookie('refreshToken', result.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      path: '/',
+    });
+
+    return { accessToken: result.accessToken };
   }
 
   @Get('me')

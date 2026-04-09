@@ -21,6 +21,7 @@ import { UpdateCommentInputDto } from './dto/input/update-comment.input.dto';
 import { Public } from '../../../core/decorators/public.decorator';
 import { JwtPublicAuthGuard } from '../../../core/guards/jwt/jwt-public-guard';
 import { CurrentPublicUser } from '../../../core/decorators/current-user.decorator';
+import { commentParamId } from './dto/input/get-id-param';
 
 @Controller('comments')
 export class CommentController {
@@ -43,13 +44,13 @@ export class CommentController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
   async likeDislikeComment(
-    @Param('commentId') commentId: string,
+    @Param() commentId: commentParamId,
     @Body() likeStatusDto: CommentLikeStatusInputDto,
     @CurrentUser() user: { login: string },
   ): Promise<void> {
     await this.commandBus.execute(
       new LikeDislikeCommentCommand(
-        commentId,
+        commentId.commentId,
         user.login,
         likeStatusDto.likeStatus,
       ),
@@ -60,11 +61,11 @@ export class CommentController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
   async deleteComment(
-    @Param('commentId') commentId: string,
+    @Param() commentId: commentParamId,
     @CurrentUser() user: { login: string },
   ): Promise<void> {
     await this.commandBus.execute(
-      new DeleteCommentCommand(commentId, user.login),
+      new DeleteCommentCommand(commentId.commentId, user.login),
     );
   }
 
@@ -72,12 +73,16 @@ export class CommentController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
   async updateComment(
-    @Param('commentId') commentId: string,
+    @Param() commentId: commentParamId,
     @Body() updateCommentDto: UpdateCommentInputDto,
     @CurrentUser() user: { login: string },
   ): Promise<void> {
     await this.commandBus.execute(
-      new UpdateCommentCommand(commentId, user.login, updateCommentDto),
+      new UpdateCommentCommand(
+        commentId.commentId,
+        user.login,
+        updateCommentDto,
+      ),
     );
   }
 }

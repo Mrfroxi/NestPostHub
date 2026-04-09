@@ -59,7 +59,9 @@ const userCommandHandlers = [CreateAdminUserUseCase, DeleteUserUseCase];
       useFactory: (): JwtService => {
         return new JwtService({
           secret: process.env.JWT_SECRET_AUTH,
-          signOptions: { expiresIn: '1h' },
+          signOptions: {
+            expiresIn: '1m',
+          },
         });
       },
     },
@@ -68,7 +70,9 @@ const userCommandHandlers = [CreateAdminUserUseCase, DeleteUserUseCase];
       useFactory: (): JwtService => {
         return new JwtService({
           secret: process.env.JWT_SECRET_REF,
-          signOptions: { expiresIn: '1h' },
+          signOptions: {
+            expiresIn: '1m',
+          },
         });
       },
     },

@@ -15,7 +15,10 @@ import { PostQueryRepository } from '../infastructure/query/post.query.repositor
 import { GetPostsQueryInputDto } from './dto/input/get-posts-query.input-dto';
 import { UpdatePostDto } from '../domain/dto/update-post.dto';
 import { CommentQueryRepository } from '../infastructure/query/comment.query.repository';
-import { type CreateCommentByPostDto } from '../domain/dto/create-comment.dto';
+import {
+  type CreateCommentByPostDto,
+  CreateCommentPostDto,
+} from '../domain/dto/create-comment.dto';
 import { GetCommentsQueryInputDto } from './dto/input/get-comments-query.input-dto';
 import { BasicAuthGuard } from '../../../core/guards/basic/basic-auth.guard';
 import { Public } from '../../../core/decorators/public.decorator';
@@ -34,6 +37,7 @@ import {
   CurrentUser,
 } from '../../../core/decorators/current-user.decorator';
 import { JwtPublicAuthGuard } from '../../../core/guards/jwt/jwt-public-guard';
+import { postParamId } from './dto/input/get-id-param';
 
 @UseGuards(BasicAuthGuard)
 @Controller('posts')
@@ -89,7 +93,7 @@ export class PostController {
   async createComment(
     @CurrentUser() user: { userId: string; login: string },
     @Param() params: { postId: string },
-    @Body() createCommentDto: CreateCommentByPostDto,
+    @Body() createCommentDto: CreateCommentPostDto,
   ) {
     const commentId: string = await this.commandBus.execute(
       new CreateCommentCommand(params.postId, createCommentDto, user),
@@ -111,12 +115,16 @@ export class PostController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
   async likeDislikePost(
-    @Param('postId') postId: string,
+    @Param() postId: postParamId,
     @Body() likeStatusDto: LikeStatusInputDto,
     @CurrentUser() user: { login: string },
   ): Promise<void> {
     await this.commandBus.execute(
-      new LikeDislikePostCommand(postId, user.login, likeStatusDto.likeStatus),
+      new LikeDislikePostCommand(
+        postId.postId,
+        user.login,
+        likeStatusDto.likeStatus,
+      ),
     );
   }
 }
