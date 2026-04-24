@@ -21,6 +21,10 @@ export interface GetPostsQueryParams {
   pageSize?: number;
 }
 
+export interface LikeStatusDto {
+  likeStatus: 'Like' | 'Dislike' | 'None';
+}
+
 export class PostsTestManager {
   constructor(private app: INestApplication) {}
 
@@ -37,11 +41,17 @@ export class PostsTestManager {
 
   async getPostById(
     id: string,
+    accessToken?: string,
     statusCode: number = HttpStatus.OK,
   ): Promise<supertest.Response> {
-    return request(this.app.getHttpServer())
-      .get(`/${GLOBAL_PREFIX}/posts/${id}`)
-      .expect(statusCode);
+    const req = request(this.app.getHttpServer())
+      .get(`/${GLOBAL_PREFIX}/posts/${id}`);
+    
+    if (accessToken) {
+      req.set('Authorization', `Bearer ${accessToken}`);
+    }
+    
+    return req.expect(statusCode);
   }
 
   async updatePost(
@@ -79,13 +89,37 @@ export class PostsTestManager {
   async createCommentForPost(
     postId: string,
     dto: CreateCommentDto,
+    accessToken: string,
     statusCode: number = HttpStatus.CREATED,
   ): Promise<supertest.Response> {
     return request(this.app.getHttpServer())
       .post(`/${GLOBAL_PREFIX}/posts/${postId}/comments`)
-      .auth('admin', 'qwerty')
+      .set('Authorization', `Bearer ${accessToken}`)
       .send(dto)
       .expect(statusCode);
   }
 
+  async getCommentsForPost(
+    postId: string,
+    params: { pageNumber?: number; pageSize?: number } = {},
+    statusCode: number = HttpStatus.OK,
+  ): Promise<supertest.Response> {
+    return request(this.app.getHttpServer())
+      .get(`/${GLOBAL_PREFIX}/posts/${postId}/comments`)
+      .query(params)
+      .expect(statusCode);
+  }
+
+  async likeDislikePost(
+    postId: string,
+    dto: LikeStatusDto,
+    accessToken: string,
+    statusCode: number = HttpStatus.NO_CONTENT,
+  ): Promise<supertest.Response> {
+    return request(this.app.getHttpServer())
+      .put(`/${GLOBAL_PREFIX}/posts/${postId}/like-status`)
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send(dto)
+      .expect(statusCode);
+  }
 }

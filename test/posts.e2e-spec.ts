@@ -310,7 +310,7 @@ describe('posts', () => {
     it('should return 404 if post not found', async () => {
       const fakePostId = '507f1f77bcf86cd799439011';
 
-      await postsTestManager.getPostById(fakePostId, 404);
+      await postsTestManager.getPostById(fakePostId, 'null',404);
     });
   });
 
@@ -475,7 +475,7 @@ describe('posts', () => {
 
       await postsTestManager.deletePost(post.body.id);
 
-      await postsTestManager.getPostById(post.body.id, 404);
+      await postsTestManager.getPostById(post.body.id, 'null',404);
     });
 
     it('should return 404 if post not found', async () => {
