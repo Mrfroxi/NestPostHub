@@ -11,6 +11,7 @@ import { LocalStrategy } from '../../core/guards/local/local.strategy';
 import { AuthService } from './application/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtStrategy } from '../../core/guards/jwt/jwt.strategy';
+import { IpRestrictionGuard } from '../../core/guards/ip/ip-restriction.guard';
 import { Session, SessionSchema } from './domain/session.entity';
 import { SessionRepository } from './infastructure/session.repository';
 import { SessionService } from './application/session.service';
@@ -84,6 +85,7 @@ const userCommandHandlers = [CreateAdminUserUseCase, DeleteUserUseCase];
     Argon2Service,
     LocalStrategy,
     JwtStrategy,
+    IpRestrictionGuard,
     AuthService,
     UsersFactory,
   ],

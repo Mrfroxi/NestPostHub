@@ -17,6 +17,7 @@ import { NewPasswordInputDto } from './input-dto/new-password.input-dto';
 import { PasswordRecoveryInputDto } from './input-dto/password-recovery.input-dto';
 import { LoginInputDto } from './input-dto/login.input-dto';
 import { JwtAuthGuard } from '../../../core/guards/jwt/jwt-auth.guard';
+import { IpRestrictionGuard } from '../../../core/guards/ip/ip-restriction.guard';
 import { CurrentUser } from '../../../core/decorators/current-user.decorator';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegisterUserCommand } from '../application/useCases/auth/register-user-command';
@@ -78,6 +79,7 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(IpRestrictionGuard)
   async login(
     @Body() dto: LoginInputDto,
     @Res({ passthrough: true }) res: Response,
