@@ -10,6 +10,7 @@ import { RegisterUserUseCase } from '@src/module/user-accounts/application/useCa
 import { ConfirmUserUseCase } from '@src/module/user-accounts/application/useCases/confirm-user.usecase';
 import { RegistrationEmailResendingUseCase } from '@src/module/user-accounts/application/useCases/registration-email-resending.usecase';
 import { NewPasswordUseCase } from '@src/module/user-accounts/application/useCases/new-password.usecase';
+import { PasswordRecoveryEmailUseCase } from '@src/module/user-accounts/application/useCases/password-recovery.useCase';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User])],
@@ -22,6 +23,7 @@ import { NewPasswordUseCase } from '@src/module/user-accounts/application/useCas
     RegisterUserUseCase,
     ConfirmUserUseCase,
     RegistrationEmailResendingUseCase,
+    PasswordRecoveryEmailUseCase,
     NewPasswordUseCase,
   ],
 })

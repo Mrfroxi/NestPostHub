@@ -1,12 +1,12 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { NewPasswordInputDto } from '@src/module/user-accounts/api/input-dto/new-password.input-dto';
+import { PasswordInputDto } from '../../api/input-dto/password.input-dto';
 import { UsersRepository } from '@src/module/user-accounts/infrastructure/user.repository';
 import { PasswordHashService } from '@core/services/password-hash.service';
 import { DomainException } from '@core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '@core/exceptions/domain-exception-codes';
 
 export class NewPasswordCommand {
-  constructor(public dto: NewPasswordInputDto) {}
+  constructor(public dto: PasswordInputDto) {}
 }
 
 @CommandHandler(NewPasswordCommand)

@@ -7,8 +7,12 @@ import { ConfirmUserInputDto } from '@src/module/user-accounts/api/input-dto/con
 import { ConfirmUserCommand } from '@src/module/user-accounts/application/useCases/confirm-user.usecase';
 import { RegistrationEmailResendingInputDto } from '@src/module/user-accounts/api/input-dto/registration-email-resending.input-dto';
 import { RegistrationEmailResendingCommand } from '@src/module/user-accounts/application/useCases/registration-email-resending.usecase';
-import { NewPasswordInputDto } from '@src/module/user-accounts/api/input-dto/new-password.input-dto';
+import {
+  PasswordInputDto,
+  PasswordRecoveryDto,
+} from './input-dto/password.input-dto';
 import { NewPasswordCommand } from '@src/module/user-accounts/application/useCases/new-password.usecase';
+import { PasswordRecoveryCommand } from '@src/module/user-accounts/application/useCases/password-recovery.useCase';
 
 @Controller('auth')
 export class AuthController {
@@ -36,8 +40,14 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.NO_CONTENT)
+  @Post('password-recovery')
+  PasswordRecovery(@Body() body: PasswordRecoveryDto) {
+    return this.commandBus.execute(new PasswordRecoveryCommand(body));
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Post('new-password')
-  newPassword(@Body() body: NewPasswordInputDto) {
+  newPassword(@Body() body: PasswordInputDto) {
     return this.commandBus.execute(new NewPasswordCommand(body));
   }
 }

@@ -33,6 +33,10 @@ class User {
     this.isConfirmed = true;
   }
 
+  setRecoveryCode(newRecoveryCode: string): void {
+    this.recoveryCode = newRecoveryCode;
+  }
+
   changeConfirmationCode(newCode: string) {
     this.confirmCode = newCode;
   }

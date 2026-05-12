@@ -30,4 +30,16 @@ export class EmailService {
       html: `<h1>Hello, ${login}!</h1><p>Your confirmation code: <b>${confirmCode}</b></p>`,
     });
   }
+
+  async sendRecoveryPasswordEmail(
+    email: string,
+    recoveryCode: string,
+  ): Promise<void> {
+    await this.transporter.sendMail({
+      from: this.notificationConfig.smtpUser,
+      to: email,
+      subject: 'Welcome to Blog Project!',
+      html: `<h1>Hello!</h1><p>Your recoveryCode code: <b>${recoveryCode}</b></p>`,
+    });
+  }
 }
