@@ -8,6 +8,8 @@ import { CreateUserDto } from '@src/module/user-accounts/dto/create-user.dto';
 import { UsersRepository } from '@src/module/user-accounts/infrastructure/user.repository';
 import { CreateUserCommand } from '@src/module/user-accounts/application/useCases/create-user.usecase';
 import { UserRegisteredEvent } from '@src/module/notification/application/events-handlers/send-welcome-email.event-handler';
+import { DomainException } from '@core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from '@core/exceptions/domain-exception-codes';
 
 export class RegisterUserCommand {
   constructor(public dto: CreateUserDto) {}
@@ -27,7 +29,13 @@ export class RegisterUserUseCase implements ICommandHandler<RegisterUserCommand>
     );
 
     const user = await this.usersRepository.findById(userId);
-    if (!user) return;
+    if (!user) {
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        message: `user not find`,
+        extensions: [{ message: `user not find`, field: 'user' }],
+      });
+    }
 
     const confirmCode: string = crypto.randomUUID();
 

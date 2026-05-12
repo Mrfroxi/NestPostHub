@@ -30,6 +30,10 @@ export class User {
     this.isConfirmed = true;
   }
 
+  changeConfirmationCode(newCode: string) {
+    this.confirmCode = newCode;
+  }
+
   @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt: Date;
 

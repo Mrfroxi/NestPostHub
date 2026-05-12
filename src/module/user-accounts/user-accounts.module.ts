@@ -8,6 +8,7 @@ import { AuthQueryRepository } from '@src/module/user-accounts/infrastructure/qu
 import { CreateUserUseCase } from '@src/module/user-accounts/application/useCases/create-user.usecase';
 import { RegisterUserUseCase } from '@src/module/user-accounts/application/useCases/register-user.usecase';
 import { ConfirmUserUseCase } from '@src/module/user-accounts/application/useCases/confirm-user.usecase';
+import { RegistrationEmailResendingUseCase } from '@src/module/user-accounts/application/useCases/registration-email-resending.usecase';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User])],
@@ -19,6 +20,7 @@ import { ConfirmUserUseCase } from '@src/module/user-accounts/application/useCas
     CreateUserUseCase,
     RegisterUserUseCase,
     ConfirmUserUseCase,
+    RegistrationEmailResendingUseCase,
   ],
 })
 export class UserAccountsModule {}

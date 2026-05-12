@@ -5,6 +5,8 @@ import { CreateUserInputDto } from '@src/module/user-accounts/api/input-dto/crea
 import { RegisterUserCommand } from '@src/module/user-accounts/application/useCases/register-user.usecase';
 import { ConfirmUserInputDto } from '@src/module/user-accounts/api/input-dto/confirm-user.input-dto';
 import { ConfirmUserCommand } from '@src/module/user-accounts/application/useCases/confirm-user.usecase';
+import { RegistrationEmailResendingInputDto } from '@src/module/user-accounts/api/input-dto/registration-email-resending.input-dto';
+import { RegistrationEmailResendingCommand } from '@src/module/user-accounts/application/useCases/registration-email-resending.usecase';
 
 @Controller('auth')
 export class AuthController {
@@ -23,5 +25,11 @@ export class AuthController {
   @Post('registration-confirmation')
   registrationConfirmation(@Body() body: ConfirmUserInputDto) {
     return this.commandBus.execute(new ConfirmUserCommand(body));
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Post('registration-email-resending')
+  registrationEmailResending(@Body() body: RegistrationEmailResendingInputDto) {
+    return this.commandBus.execute(new RegistrationEmailResendingCommand(body));
   }
 }
