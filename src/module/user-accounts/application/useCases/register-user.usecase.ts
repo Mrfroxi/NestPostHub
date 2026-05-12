@@ -29,9 +29,6 @@ export class RegisterUserUseCase implements ICommandHandler<RegisterUserCommand>
     const user = await this.usersRepository.findById(userId);
     if (!user) return;
 
-    user.setConfirmed();
-    await this.usersRepository.save(user);
-
     const confirmCode: string = crypto.randomUUID();
 
     this.eventBus.publish(

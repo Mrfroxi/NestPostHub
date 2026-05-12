@@ -31,6 +31,10 @@ export class UsersRepository {
     return this.usersRepository.findOneBy({ id });
   }
 
+  async findByCode(confirmCode: string): Promise<User | null> {
+    return this.usersRepository.findOneBy({ confirmCode });
+  }
+
   async save(user: User): Promise<User> {
     return this.usersRepository.save(user);
   }

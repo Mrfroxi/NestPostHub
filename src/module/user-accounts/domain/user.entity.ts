@@ -20,6 +20,9 @@ export class User {
   @Column({ type: 'varchar', nullable: false })
   passwordHash: string;
 
+  @Column({ type: 'varchar', nullable: true })
+  confirmCode: string;
+
   @Column({ type: 'boolean', default: false })
   isConfirmed: boolean;
 
