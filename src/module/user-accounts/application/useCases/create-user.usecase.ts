@@ -3,6 +3,7 @@ import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UsersRepository } from '@src/module/user-accounts/infrastructure/user.repository';
 import { DomainException } from '@core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '@core/exceptions/domain-exception-codes';
+import { PasswordHashService } from '@core/services/password-hash.service';
 
 export class CreateUserCommand {
   constructor(public dto: CreateUserDto) {}
@@ -13,6 +14,7 @@ export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
   constructor(
     private commandBus: CommandBus,
     private usersRepository: UsersRepository,
+    private passwordHashService: PasswordHashService,
   ) {}
 
   async execute(command: CreateUserCommand): Promise<void> {
@@ -42,6 +44,7 @@ export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
       });
     }
 
-    await this.usersRepository.create(dto.login, dto.email, dto.password);
+    const passwordHash = await this.passwordHashService.hash(dto.password);
+    await this.usersRepository.create(dto.login, dto.email, passwordHash);
   }
 }
