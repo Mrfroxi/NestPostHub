@@ -39,6 +39,10 @@ export class RegisterUserUseCase implements ICommandHandler<RegisterUserCommand>
 
     const confirmCode: string = crypto.randomUUID();
 
+    user.setConfirmCode(confirmCode);
+
+    await this.usersRepository.save(user);
+
     this.eventBus.publish(
       new UserRegisteredEvent(user.email, user.login, confirmCode),
     );

@@ -26,6 +26,14 @@ export class RegistrationEmailResendingUseCase implements ICommandHandler<Regist
       });
     }
 
+    if (user.isConfirmed) {
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        message: `user confirmed`,
+        extensions: [{ message: `user confirmed`, field: 'isConfirmed' }],
+      });
+    }
+
     const newCode: string = crypto.randomUUID();
 
     user.changeConfirmationCode(newCode);
