@@ -1,4 +1,13 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Headers,
+  HttpCode,
+  HttpStatus,
+  Ip,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { AuthQueryRepository } from '@src/module/user-accounts/infrastructure/query/auth.query-repository';
 import { CreateUserInputDto } from '@src/module/user-accounts/api/input-dto/create-user.input-dto';
@@ -13,6 +22,11 @@ import {
 } from './input-dto/password.input-dto';
 import { NewPasswordCommand } from '@src/module/user-accounts/application/useCases/new-password.usecase';
 import { PasswordRecoveryCommand } from '@src/module/user-accounts/application/useCases/password-recovery.useCase';
+import { LoginInputDto } from '@src/module/user-accounts/api/input-dto/login.input-dto';
+import { LoginCommand } from '@src/module/user-accounts/application/useCases/login.usecase';
+import { RefreshTokenCommand } from '@src/module/user-accounts/application/useCases/refresh-token.usecase';
+import { LogoutCommand } from '@src/module/user-accounts/application/useCases/logout.usecase';
+import { JwtAuthGuard } from '@src/module/user-accounts/infrastructure/guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -49,5 +63,28 @@ export class AuthController {
   @Post('new-password')
   newPassword(@Body() body: PasswordInputDto) {
     return this.commandBus.execute(new NewPasswordCommand(body));
+  }
+
+  @Post('login')
+  login(
+    @Body() body: LoginInputDto,
+    @Ip() ip: string,
+    @Headers('user-agent') userAgent: string,
+  ) {
+    return this.commandBus.execute(
+      new LoginCommand(body, ip, userAgent || 'unknown'),
+    );
+  }
+
+  @Post('refresh-token')
+  refreshToken(@Body('refreshToken') refreshToken: string) {
+    return this.commandBus.execute(new RefreshTokenCommand(refreshToken));
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Post('logout')
+  logout(@Body('refreshToken') refreshToken: string) {
+    return this.commandBus.execute(new LogoutCommand(refreshToken));
   }
 }
