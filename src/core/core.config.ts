@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber } from 'class-validator';
 import { ConfigService } from '@nestjs/config';
 import { configValidationUtility } from '@src/setup/config-validation.utility';
 
@@ -12,6 +12,11 @@ export class CoreConfig {
     this.username = this.configService.get('DB_USERNAME');
     this.password = this.configService.get('DB_PASSWORD');
     this.dbName = this.configService.get('DB_DATABASE');
+
+    this.sendInternalServerErrorDetails =
+      configValidationUtility.convertToBoolean(
+        this.configService.get('SEND_INTERNAL_SERVER_ERROR_DETAILS'),
+      ) as boolean;
 
     configValidationUtility.validateConfig(this);
   }
@@ -51,4 +56,10 @@ export class CoreConfig {
     message: 'Set Env variable DB_DATABASE, example: blog-project',
   })
   dbName: string;
+
+  @IsBoolean({
+    message:
+      'Set Env variable SEND_INTERNAL_SERVER_ERROR_DETAILS to enable/disable Dangerous for production internal server error details (message, etc), example: true, available values: true, false, 0, 1',
+  })
+  sendInternalServerErrorDetails: boolean;
 }
