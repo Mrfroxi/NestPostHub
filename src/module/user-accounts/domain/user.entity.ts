@@ -23,6 +23,10 @@ export class User {
   @Column({ type: 'boolean', default: false })
   isConfirmed: boolean;
 
+  setConfirmed(): void {
+    this.isConfirmed = true;
+  }
+
   @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt: Date;
 

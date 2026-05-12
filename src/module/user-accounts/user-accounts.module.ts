@@ -6,6 +6,7 @@ import { UsersRepository } from '@src/module/user-accounts/infrastructure/user.r
 import { AuthController } from '@src/module/user-accounts/api/auth.controller';
 import { AuthQueryRepository } from '@src/module/user-accounts/infrastructure/query/auth.query-repository';
 import { CreateUserUseCase } from '@src/module/user-accounts/application/useCases/create-user.usecase';
+import { RegisterUserUseCase } from '@src/module/user-accounts/application/useCases/register-user.usecase';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User])],
@@ -15,6 +16,7 @@ import { CreateUserUseCase } from '@src/module/user-accounts/application/useCase
     UsersRepository,
     AuthQueryRepository,
     CreateUserUseCase,
+    RegisterUserUseCase,
   ],
 })
 export class UserAccountsModule {}

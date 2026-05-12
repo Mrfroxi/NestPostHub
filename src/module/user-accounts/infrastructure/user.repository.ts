@@ -30,4 +30,8 @@ export class UsersRepository {
   async findById(id: string): Promise<User | null> {
     return this.usersRepository.findOneBy({ id });
   }
+
+  async save(user: User): Promise<User> {
+    return this.usersRepository.save(user);
+  }
 }

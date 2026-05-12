@@ -17,34 +17,37 @@ export class CreateUserUseCase implements ICommandHandler<CreateUserCommand> {
     private passwordHashService: PasswordHashService,
   ) {}
 
-  async execute(command: CreateUserCommand): Promise<void> {
+  private async validateUniqueness(
+    value: string,
+    field: 'email' | 'login',
+  ): Promise<void> {
+    const existing =
+      field === 'email'
+        ? await this.usersRepository.findByEmail(value)
+        : await this.usersRepository.findByLogin(value);
+
+    if (existing) {
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        message: `${field} is not unique`,
+        extensions: [{ message: `${field} is not unique`, field }],
+      });
+    }
+  }
+
+  async execute(command: CreateUserCommand): Promise<string> {
     const { dto } = command;
 
-    const validByEmail = await this.usersRepository.findByEmail(dto.email);
-
-    if (validByEmail) {
-      throw new DomainException({
-        code: DomainExceptionCode.BadRequest,
-        message: 'validByEmail is not unique',
-        extensions: [
-          { message: 'validByEmail is not unique', field: 'validByEmail' },
-        ],
-      });
-    }
-
-    const validByLogin = await this.usersRepository.findByLogin(dto.login);
-
-    if (validByLogin) {
-      throw new DomainException({
-        code: DomainExceptionCode.BadRequest,
-        message: 'validByLogin is not unique',
-        extensions: [
-          { message: 'validByLogin is not unique', field: 'validByLogin' },
-        ],
-      });
-    }
+    await this.validateUniqueness(dto.email, 'email');
+    await this.validateUniqueness(dto.login, 'login');
 
     const passwordHash = await this.passwordHashService.hash(dto.password);
-    await this.usersRepository.create(dto.login, dto.email, passwordHash);
+    const createdUser = await this.usersRepository.create(
+      dto.login,
+      dto.email,
+      passwordHash,
+    );
+
+    return createdUser.id;
   }
 }
