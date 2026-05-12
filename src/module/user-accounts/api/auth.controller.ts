@@ -7,6 +7,8 @@ import { ConfirmUserInputDto } from '@src/module/user-accounts/api/input-dto/con
 import { ConfirmUserCommand } from '@src/module/user-accounts/application/useCases/confirm-user.usecase';
 import { RegistrationEmailResendingInputDto } from '@src/module/user-accounts/api/input-dto/registration-email-resending.input-dto';
 import { RegistrationEmailResendingCommand } from '@src/module/user-accounts/application/useCases/registration-email-resending.usecase';
+import { NewPasswordInputDto } from '@src/module/user-accounts/api/input-dto/new-password.input-dto';
+import { NewPasswordCommand } from '@src/module/user-accounts/application/useCases/new-password.usecase';
 
 @Controller('auth')
 export class AuthController {
@@ -31,5 +33,11 @@ export class AuthController {
   @Post('registration-email-resending')
   registrationEmailResending(@Body() body: RegistrationEmailResendingInputDto) {
     return this.commandBus.execute(new RegistrationEmailResendingCommand(body));
+  }
+
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Post('new-password')
+  newPassword(@Body() body: NewPasswordInputDto) {
+    return this.commandBus.execute(new NewPasswordCommand(body));
   }
 }
