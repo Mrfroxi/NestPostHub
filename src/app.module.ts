@@ -5,11 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CoreModule } from '@core/core.module';
+import { UserAccountsModule } from '@src/module/user-accounts/user-accounts.module';
 
 @Module({
   imports: [
     configModule,
     CoreModule,
+    UserAccountsModule,
     TypeOrmModule.forRootAsync({
       useFactory: (config: CoreConfig) => ({
         type: 'postgres',
@@ -18,7 +20,7 @@ import { CoreModule } from '@core/core.module';
         username: config.username,
         password: config.password,
         database: config.dbName,
-        entities: [],
+        autoLoadEntities: true,
         synchronize: true,
       }),
       inject: [CoreConfig],
