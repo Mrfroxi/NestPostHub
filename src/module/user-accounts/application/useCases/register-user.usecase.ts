@@ -7,6 +7,7 @@ import {
 import { CreateUserDto } from '@src/module/user-accounts/dto/create-user.dto';
 import { UsersRepository } from '@src/module/user-accounts/infrastructure/user.repository';
 import { CreateUserCommand } from '@src/module/user-accounts/application/useCases/create-user.usecase';
+import { UserRegisteredEvent } from '@src/module/notification/application/events-handlers/send-welcome-email.event-handler';
 
 export class RegisterUserCommand {
   constructor(public dto: CreateUserDto) {}
@@ -32,5 +33,9 @@ export class RegisterUserUseCase implements ICommandHandler<RegisterUserCommand>
     await this.usersRepository.save(user);
 
     const confirmCode: string = crypto.randomUUID();
+
+    this.eventBus.publish(
+      new UserRegisteredEvent(user.email, user.login, confirmCode),
+    );
   }
 }
