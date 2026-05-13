@@ -6,11 +6,12 @@ import {
   HttpStatus,
   Ip,
   Post,
+  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import { AuthQueryRepository } from '@src/module/user-accounts/infrastructure/query/auth.query-repository';
 import { CreateUserInputDto } from '@src/module/user-accounts/api/input-dto/create-user.input-dto';
 import { RegisterUserCommand } from '../application/useCases/auth/register-user.usecase';
@@ -76,11 +77,14 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async login(
     @Body() body: LoginInputDto,
+    @Req() req: Request,
     @Ip() ip: string,
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ accessToken: string }> {
+    const title = (req.headers['user-agent'] as string) ?? '';
+
     const { accessToken, refreshToken } = await this.commandBus.execute(
-      new LoginCommand(body.loginOrEmail, body.password, ip),
+      new LoginCommand(body.loginOrEmail, body.password, ip, title),
     );
 
     res.cookie('refreshToken', refreshToken, {
@@ -96,11 +100,14 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async refreshToken(
     @CurrentUser() user: UserPayload,
+    @Req() req: Request,
     @Ip() ip: string,
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ accessToken: string }> {
+    const title = (req.headers['user-agent'] as string) ?? '';
+
     const { accessToken, refreshToken } = await this.commandBus.execute(
-      new RefreshTokenCommand(user.userId, user.deviceId, ip),
+      new RefreshTokenCommand(user.userId, user.deviceId, ip, title),
     );
 
     res.cookie('refreshToken', refreshToken, {

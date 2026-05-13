@@ -35,7 +35,7 @@ export class AuthQueryRepository {
 
     return sessions.map((s) => ({
       ip: s.ip,
-      title: '',
+      title: s.title ?? '',
       lastActiveDate: s.createdAt.toISOString(),
       deviceId: s.deviceId,
     }));

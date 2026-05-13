@@ -19,6 +19,9 @@ export class DeviceSession {
   @Column({ type: 'varchar', nullable: true })
   ip: string;
 
+  @Column({ type: 'varchar', nullable: true })
+  title: string;
+
   @Column({ type: 'varchar', nullable: false })
   refreshToken: string;
 
@@ -39,6 +42,7 @@ export class DeviceSession {
     deviceId: string;
     userId: string;
     ip: string;
+    title: string;
     refreshToken: string;
     expiresAt: string;
   }): DeviceSession {
@@ -46,6 +50,7 @@ export class DeviceSession {
     session.deviceId = payload.deviceId;
     session.userId = payload.userId;
     session.ip = payload.ip;
+    session.title = payload.title;
     session.refreshToken = payload.refreshToken;
     session.expiresAt = payload.expiresAt;
     return session;

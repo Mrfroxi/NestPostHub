@@ -15,6 +15,7 @@ export class RefreshTokenCommand {
     public userId: string,
     public deviceId: string,
     public ip: string,
+    public title: string,
   ) {}
 }
 
@@ -57,8 +58,9 @@ export class RefreshTokenUseCase implements ICommandHandler<RefreshTokenCommand>
 
     const newSession = DeviceSession.create({
       deviceId,
-      userId: userId,
+      userId,
       ip,
+      title: command.title,
       refreshToken: newRefreshToken,
       expiresAt: exp,
     });

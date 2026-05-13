@@ -17,6 +17,7 @@ export class LoginCommand {
     public loginOrEmail: string,
     public password: string,
     public ip: string,
+    public title: string,
   ) {}
 }
 
@@ -83,6 +84,7 @@ export class LoginUseCase implements ICommandHandler<LoginCommand> {
       deviceId,
       userId: user.id,
       ip,
+      title: command.title,
       refreshToken,
       expiresAt: exp,
     });
