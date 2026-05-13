@@ -21,8 +21,8 @@ export class DeviceSession {
   @Column({ type: 'varchar', nullable: false })
   refreshTokenHash: string;
 
-  @Column({ type: 'timestamp with time zone' })
-  expiresAt: Date;
+  @Column({ type: 'varchar' })
+  expiresAt: string;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt: Date;
@@ -32,4 +32,20 @@ export class DeviceSession {
 
   @Column()
   userId: string;
+
+  static create(
+    deviceId: string,
+    userId: string,
+    ip: string,
+    refreshTokenHash: string,
+    expiresAt: string,
+  ): DeviceSession {
+    const session = new DeviceSession();
+    session.deviceId = deviceId;
+    session.userId = userId;
+    session.ip = ip;
+    session.refreshTokenHash = refreshTokenHash;
+    session.expiresAt = expiresAt;
+    return session;
+  }
 }

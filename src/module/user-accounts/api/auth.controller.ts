@@ -1,5 +1,14 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Ip,
+  Post,
+  Res,
+} from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
+import type { Response } from 'express';
 import { AuthQueryRepository } from '@src/module/user-accounts/infrastructure/query/auth.query-repository';
 import { CreateUserInputDto } from '@src/module/user-accounts/api/input-dto/create-user.input-dto';
 import { RegisterUserCommand } from '@src/module/user-accounts/application/useCases/register-user.usecase';
@@ -12,7 +21,9 @@ import {
   PasswordRecoveryDto,
 } from './input-dto/password.input-dto';
 import { NewPasswordCommand } from '@src/module/user-accounts/application/useCases/new-password.usecase';
-import { PasswordRecoveryCommand } from '@src/module/user-accounts/application/useCases/password-recovery.useCase';
+import { PasswordRecoveryCommand } from '../application/useCases/password-recovery.usecase';
+import { LoginCommand } from '@src/module/user-accounts/application/useCases/login.usecase';
+import { LoginInputDto } from '@src/module/user-accounts/api/input-dto/login-input.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -49,5 +60,23 @@ export class AuthController {
   @Post('new-password')
   newPassword(@Body() body: PasswordInputDto) {
     return this.commandBus.execute(new NewPasswordCommand(body));
+  }
+
+  @Post('login')
+  async login(
+    @Body() body: LoginInputDto,
+    @Ip() ip: string,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<{ accessToken: string }> {
+    const { accessToken, refreshToken } = await this.commandBus.execute(
+      new LoginCommand(body.loginOrEmail, body.password, ip),
+    );
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
+
+    return { accessToken };
   }
 }

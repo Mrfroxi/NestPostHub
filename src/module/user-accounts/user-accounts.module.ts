@@ -10,12 +10,24 @@ import { RegisterUserUseCase } from '@src/module/user-accounts/application/useCa
 import { ConfirmUserUseCase } from '@src/module/user-accounts/application/useCases/confirm-user.usecase';
 import { RegistrationEmailResendingUseCase } from '@src/module/user-accounts/application/useCases/registration-email-resending.usecase';
 import { NewPasswordUseCase } from '@src/module/user-accounts/application/useCases/new-password.usecase';
-import { PasswordRecoveryEmailUseCase } from '@src/module/user-accounts/application/useCases/password-recovery.useCase';
+import { PasswordRecoveryEmailUseCase } from './application/useCases/password-recovery.usecase';
 import { JwtStrategy } from '@src/module/user-accounts/guards/bearer/jwt.strategy';
+import { DeviceSession } from '@src/module/user-accounts/domain/device-session.entity';
+import { DeviceSessionRepository } from '@src/module/user-accounts/infrastructure/device-session.repository';
+import { LoginUseCase } from '@src/module/user-accounts/application/useCases/login.usecase';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import {
+  ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
+  REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
+} from '@src/module/user-accounts/constants/auth-tokens.inject-constants';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), PassportModule],
+  imports: [
+    TypeOrmModule.forFeature([User, DeviceSession]),
+    JwtModule,
+    PassportModule,
+  ],
   controllers: [AuthController],
   providers: [
     UserAccountsConfig,
@@ -27,6 +39,32 @@ import { PassportModule } from '@nestjs/passport';
     RegistrationEmailResendingUseCase,
     PasswordRecoveryEmailUseCase,
     NewPasswordUseCase,
+    DeviceSessionRepository,
+    LoginUseCase,
+    {
+      provide: ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
+      useFactory: (userAccountConfig: UserAccountsConfig): JwtService => {
+        return new JwtService({
+          secret: userAccountConfig.accessTokenSecret,
+          signOptions: {
+            expiresIn: userAccountConfig.accessTokenExpireIn as any,
+          },
+        });
+      },
+      inject: [UserAccountsConfig],
+    },
+    {
+      provide: REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
+      useFactory: (userAccountConfig: UserAccountsConfig): JwtService => {
+        return new JwtService({
+          secret: userAccountConfig.refreshTokenSecret,
+          signOptions: {
+            expiresIn: userAccountConfig.refreshTokenExpireIn as any,
+          },
+        });
+      },
+      inject: [UserAccountsConfig],
+    },
     JwtStrategy,
   ],
 })
