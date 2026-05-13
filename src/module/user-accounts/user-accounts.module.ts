@@ -17,6 +17,7 @@ import { DeviceSession } from '@src/module/user-accounts/domain/device-session.e
 import { DeviceSessionRepository } from '@src/module/user-accounts/infrastructure/device-session.repository';
 import { LoginUseCase } from '@src/module/user-accounts/application/useCases/login.usecase';
 import { RefreshTokenUseCase } from '@src/module/user-accounts/application/useCases/refresh-token.usecase';
+import { LogoutUseCase } from '@src/module/user-accounts/application/useCases/logout.usecase';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import {
@@ -44,6 +45,7 @@ import {
     DeviceSessionRepository,
     LoginUseCase,
     RefreshTokenUseCase,
+    LogoutUseCase,
     JwtRefreshCookieGuard,
     {
       provide: ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,

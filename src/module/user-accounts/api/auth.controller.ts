@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Ip,
@@ -26,6 +27,10 @@ import { PasswordRecoveryCommand } from '../application/useCases/password-recove
 import { LoginCommand } from '@src/module/user-accounts/application/useCases/login.usecase';
 import { LoginInputDto } from '@src/module/user-accounts/api/input-dto/login-input.dto';
 import { RefreshTokenCommand } from '@src/module/user-accounts/application/useCases/refresh-token.usecase';
+import { LogoutCommand } from '@src/module/user-accounts/application/useCases/logout.usecase';
+import { DomainException } from '@core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from '@core/exceptions/domain-exception-codes';
+import { JwtAuthGuard } from '@src/module/user-accounts/guards/bearer/jwt-auth.guard';
 import { JwtRefreshCookieGuard } from '@src/module/user-accounts/guards/cookie/jwt-cookie.guard';
 import { CurrentUser } from '@core/decorators/current-user.decorator';
 import type { UserPayload } from '@core/decorators/current-user.decorator';
@@ -104,5 +109,31 @@ export class AuthController {
     });
 
     return { accessToken };
+  }
+
+  @UseGuards(JwtRefreshCookieGuard)
+  @Post('logout')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async logout(@CurrentUser() user: UserPayload): Promise<void> {
+    await this.commandBus.execute(
+      new LogoutCommand(user.userId, user.deviceId),
+    );
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async me(
+    @CurrentUser() user: UserPayload,
+  ): Promise<{ email: string; login: string; userId: string }> {
+    const foundUser = await this.authQueryRepository.getUserById(user.userId);
+    if (!foundUser) {
+      throw new DomainException({
+        code: DomainExceptionCode.Unauthorized,
+        message: 'User not found',
+        extensions: [{ message: 'User not found', field: 'userId' }],
+      });
+    }
+
+    return foundUser;
   }
 }
