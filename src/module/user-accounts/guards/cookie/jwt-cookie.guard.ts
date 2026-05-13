@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import type { Request } from 'express';
 import { REFRESH_TOKEN_STRATEGY_INJECT_TOKEN } from '@src/module/user-accounts/constants/auth-tokens.inject-constants';
 import type { UserPayload } from '@core/decorators/current-user.decorator';
+import { DeviceSessionRepository } from '@src/module/user-accounts/infrastructure/device-session.repository';
 import { DomainException } from '@core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '@core/exceptions/domain-exception-codes';
 
@@ -16,9 +17,10 @@ export class JwtRefreshCookieGuard implements CanActivate {
   constructor(
     @Inject(REFRESH_TOKEN_STRATEGY_INJECT_TOKEN)
     private jwtService: JwtService,
+    private deviceSessionRepository: DeviceSessionRepository,
   ) {}
 
-  canActivate(context: ExecutionContext): boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
     const token = request.cookies?.refreshToken ?? null;
 
@@ -32,10 +34,9 @@ export class JwtRefreshCookieGuard implements CanActivate {
       });
     }
 
+    let payload: UserPayload;
     try {
-      const payload = this.jwtService.verify<UserPayload>(token);
-      (request as any).user = payload;
-      return true;
+      payload = this.jwtService.verify<UserPayload>(token);
     } catch {
       throw new DomainException({
         code: DomainExceptionCode.Unauthorized,
@@ -45,5 +46,23 @@ export class JwtRefreshCookieGuard implements CanActivate {
         ],
       });
     }
+
+    const session = await this.deviceSessionRepository.findByDeviceIdAndUserId(
+      payload.deviceId,
+      payload.userId,
+    );
+
+    if (!session) {
+      throw new DomainException({
+        code: DomainExceptionCode.Unauthorized,
+        message: 'Session not found',
+        extensions: [
+          { message: 'Session not found or expired', field: 'deviceId' },
+        ],
+      });
+    }
+
+    (request as any).user = payload;
+    return true;
   }
 }
