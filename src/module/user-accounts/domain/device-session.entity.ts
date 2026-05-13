@@ -4,6 +4,7 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  JoinColumn,
 } from 'typeorm';
 import User from '@src/module/user-accounts/domain/user.entity';
 
@@ -19,7 +20,7 @@ export class DeviceSession {
   ip: string;
 
   @Column({ type: 'varchar', nullable: false })
-  refreshTokenHash: string;
+  refreshToken: string;
 
   @Column({ type: 'varchar' })
   expiresAt: string;
@@ -28,24 +29,25 @@ export class DeviceSession {
   createdAt: Date;
 
   @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
   user: User;
 
-  @Column()
+  @Column({ type: 'varchar' })
   userId: string;
 
-  static create(
-    deviceId: string,
-    userId: string,
-    ip: string,
-    refreshTokenHash: string,
-    expiresAt: string,
-  ): DeviceSession {
+  static create(payload: {
+    deviceId: string;
+    userId: string;
+    ip: string;
+    refreshToken: string;
+    expiresAt: string;
+  }): DeviceSession {
     const session = new DeviceSession();
-    session.deviceId = deviceId;
-    session.userId = userId;
-    session.ip = ip;
-    session.refreshTokenHash = refreshTokenHash;
-    session.expiresAt = expiresAt;
+    session.deviceId = payload.deviceId;
+    session.userId = payload.userId;
+    session.ip = payload.ip;
+    session.refreshToken = payload.refreshToken;
+    session.expiresAt = payload.expiresAt;
     return session;
   }
 }

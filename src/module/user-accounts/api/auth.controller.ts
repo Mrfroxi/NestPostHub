@@ -6,6 +6,7 @@ import {
   Ip,
   Post,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import type { Response } from 'express';
@@ -24,6 +25,10 @@ import { NewPasswordCommand } from '@src/module/user-accounts/application/useCas
 import { PasswordRecoveryCommand } from '../application/useCases/password-recovery.usecase';
 import { LoginCommand } from '@src/module/user-accounts/application/useCases/login.usecase';
 import { LoginInputDto } from '@src/module/user-accounts/api/input-dto/login-input.dto';
+import { RefreshTokenCommand } from '@src/module/user-accounts/application/useCases/refresh-token.usecase';
+import { JwtRefreshCookieGuard } from '@src/module/user-accounts/guards/cookie/jwt-cookie.guard';
+import { CurrentUser } from '@core/decorators/current-user.decorator';
+import type { UserPayload } from '@core/decorators/current-user.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -63,6 +68,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @HttpCode(HttpStatus.OK)
   async login(
     @Body() body: LoginInputDto,
     @Ip() ip: string,
@@ -70,6 +76,26 @@ export class AuthController {
   ): Promise<{ accessToken: string }> {
     const { accessToken, refreshToken } = await this.commandBus.execute(
       new LoginCommand(body.loginOrEmail, body.password, ip),
+    );
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+    });
+
+    return { accessToken };
+  }
+
+  @UseGuards(JwtRefreshCookieGuard)
+  @Post('refresh-token')
+  @HttpCode(HttpStatus.OK)
+  async refreshToken(
+    @CurrentUser() user: UserPayload,
+    @Ip() ip: string,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<{ accessToken: string }> {
+    const { accessToken, refreshToken } = await this.commandBus.execute(
+      new RefreshTokenCommand(user.userId, user.deviceId, ip),
     );
 
     res.cookie('refreshToken', refreshToken, {

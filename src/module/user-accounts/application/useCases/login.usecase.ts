@@ -79,13 +79,13 @@ export class LoginUseCase implements ICommandHandler<LoginCommand> {
 
     const { exp } = this.refreshTokenContext.verify(refreshToken);
 
-    const session = DeviceSession.create(
+    const session = DeviceSession.create({
       deviceId,
-      user.id,
+      userId: user.id,
       ip,
       refreshToken,
-      exp,
-    );
+      expiresAt: exp,
+    });
 
     await this.deviceSessionRepository.save(session);
 

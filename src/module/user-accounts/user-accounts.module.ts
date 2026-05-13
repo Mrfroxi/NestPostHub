@@ -12,9 +12,11 @@ import { RegistrationEmailResendingUseCase } from '@src/module/user-accounts/app
 import { NewPasswordUseCase } from '@src/module/user-accounts/application/useCases/new-password.usecase';
 import { PasswordRecoveryEmailUseCase } from './application/useCases/password-recovery.usecase';
 import { JwtStrategy } from '@src/module/user-accounts/guards/bearer/jwt.strategy';
+import { JwtRefreshCookieGuard } from '@src/module/user-accounts/guards/cookie/jwt-cookie.guard';
 import { DeviceSession } from '@src/module/user-accounts/domain/device-session.entity';
 import { DeviceSessionRepository } from '@src/module/user-accounts/infrastructure/device-session.repository';
 import { LoginUseCase } from '@src/module/user-accounts/application/useCases/login.usecase';
+import { RefreshTokenUseCase } from '@src/module/user-accounts/application/useCases/refresh-token.usecase';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import {
@@ -41,6 +43,8 @@ import {
     NewPasswordUseCase,
     DeviceSessionRepository,
     LoginUseCase,
+    RefreshTokenUseCase,
+    JwtRefreshCookieGuard,
     {
       provide: ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
       useFactory: (userAccountConfig: UserAccountsConfig): JwtService => {
