@@ -42,4 +42,8 @@ export class UsersRepository {
   async save(user: User): Promise<User> {
     return this.usersRepository.save(user);
   }
+
+  async deleteById(id: string): Promise<void> {
+    await this.usersRepository.delete(id);
+  }
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IsNotEmpty } from 'class-validator';
-import { configValidationUtility } from '../../../setup/config-validation.utility';
+import { configValidationUtility } from '@src/setup/config-validation.utility';
 
 @Injectable()
 export class UserAccountsConfig {
@@ -13,6 +13,9 @@ export class UserAccountsConfig {
 
     this.accessTokenSecret = this.configService.get('ACCESS_TOKEN_SECRET');
     this.refreshTokenSecret = this.configService.get('REFRESH_TOKEN_SECRET');
+
+    this.adminLogin = this.configService.get('ADMIN_USER');
+    this.adminPassword = this.configService.get('ADMIN_PASSWORD');
 
     configValidationUtility.validateConfig(this);
   }
@@ -36,4 +39,14 @@ export class UserAccountsConfig {
     message: 'Set Env variable ACCESS_TOKEN_SECRET, dangerous for security!',
   })
   accessTokenSecret: string;
+
+  @IsNotEmpty({
+    message: 'adminLogin',
+  })
+  adminLogin: string;
+
+  @IsNotEmpty({
+    message: 'adminPassword',
+  })
+  adminPassword: string;
 }
