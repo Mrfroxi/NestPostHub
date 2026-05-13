@@ -13,21 +13,21 @@ import { CommandBus } from '@nestjs/cqrs';
 import type { Response } from 'express';
 import { AuthQueryRepository } from '@src/module/user-accounts/infrastructure/query/auth.query-repository';
 import { CreateUserInputDto } from '@src/module/user-accounts/api/input-dto/create-user.input-dto';
-import { RegisterUserCommand } from '@src/module/user-accounts/application/useCases/register-user.usecase';
+import { RegisterUserCommand } from '../application/useCases/auth/register-user.usecase';
 import { ConfirmUserInputDto } from '@src/module/user-accounts/api/input-dto/confirm-user.input-dto';
-import { ConfirmUserCommand } from '@src/module/user-accounts/application/useCases/confirm-user.usecase';
+import { ConfirmUserCommand } from '../application/useCases/auth/confirm-user.usecase';
 import { RegistrationEmailResendingInputDto } from '@src/module/user-accounts/api/input-dto/registration-email-resending.input-dto';
-import { RegistrationEmailResendingCommand } from '@src/module/user-accounts/application/useCases/registration-email-resending.usecase';
+import { RegistrationEmailResendingCommand } from '../application/useCases/auth/registration-email-resending.usecase';
 import {
   PasswordInputDto,
   PasswordRecoveryDto,
 } from './input-dto/password.input-dto';
-import { NewPasswordCommand } from '@src/module/user-accounts/application/useCases/new-password.usecase';
-import { PasswordRecoveryCommand } from '../application/useCases/password-recovery.usecase';
-import { LoginCommand } from '@src/module/user-accounts/application/useCases/login.usecase';
+import { NewPasswordCommand } from '../application/useCases/auth/new-password.usecase';
+import { PasswordRecoveryCommand } from '../application/useCases/auth/password-recovery.usecase';
+import { LoginCommand } from '../application/useCases/auth/login.usecase';
 import { LoginInputDto } from '@src/module/user-accounts/api/input-dto/login-input.dto';
-import { RefreshTokenCommand } from '@src/module/user-accounts/application/useCases/refresh-token.usecase';
-import { LogoutCommand } from '@src/module/user-accounts/application/useCases/logout.usecase';
+import { RefreshTokenCommand } from '../application/useCases/auth/refresh-token.usecase';
+import { LogoutCommand } from '../application/useCases/auth/logout.usecase';
 import { DomainException } from '@core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '@core/exceptions/domain-exception-codes';
 import { JwtAuthGuard } from '@src/module/user-accounts/guards/bearer/jwt-auth.guard';

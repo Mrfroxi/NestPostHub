@@ -1,9 +1,9 @@
-import { CreateUserDto } from '@src/module/user-accounts/dto/create-user.dto';
+import { CreateUserDto } from 'src/module/user-accounts/dto/create-user.dto';
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UsersRepository } from '@src/module/user-accounts/infrastructure/user.repository';
-import { DomainException } from '@core/exceptions/domain-exceptions';
-import { DomainExceptionCode } from '@core/exceptions/domain-exception-codes';
-import { PasswordHashService } from '@core/services/password-hash.service';
+import { UsersRepository } from 'src/module/user-accounts/infrastructure/user.repository';
+import { DomainException } from 'src/core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from 'src/core/exceptions/domain-exception-codes';
+import { PasswordHashService } from 'src/core/services/password-hash.service';
 
 export class CreateUserCommand {
   constructor(public dto: CreateUserDto) {}

@@ -4,12 +4,12 @@ import {
   EventBus,
   ICommandHandler,
 } from '@nestjs/cqrs';
-import { CreateUserDto } from '@src/module/user-accounts/dto/create-user.dto';
-import { UsersRepository } from '@src/module/user-accounts/infrastructure/user.repository';
-import { CreateUserCommand } from '@src/module/user-accounts/application/useCases/create-user.usecase';
-import { UserRegisteredEvent } from '@src/module/notification/application/events-handlers/send-welcome-email.event-handler';
-import { DomainException } from '@core/exceptions/domain-exceptions';
-import { DomainExceptionCode } from '@core/exceptions/domain-exception-codes';
+import { CreateUserDto } from 'src/module/user-accounts/dto/create-user.dto';
+import { UsersRepository } from 'src/module/user-accounts/infrastructure/user.repository';
+import { CreateUserCommand } from 'src/module/user-accounts/application/useCases/auth/create-user.usecase';
+import { UserRegisteredEvent } from 'src/module/notification/application/events-handlers/send-welcome-email.event-handler';
+import { DomainException } from 'src/core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from 'src/core/exceptions/domain-exception-codes';
 
 export class RegisterUserCommand {
   constructor(public dto: CreateUserDto) {}

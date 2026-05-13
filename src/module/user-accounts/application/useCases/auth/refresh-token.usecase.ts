@@ -4,11 +4,11 @@ import { JwtService } from '@nestjs/jwt';
 import {
   ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
   REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
-} from '@src/module/user-accounts/constants/auth-tokens.inject-constants';
-import { DeviceSessionRepository } from '@src/module/user-accounts/infrastructure/device-session.repository';
-import { DeviceSession } from '@src/module/user-accounts/domain/device-session.entity';
-import { DomainException } from '@core/exceptions/domain-exceptions';
-import { DomainExceptionCode } from '@core/exceptions/domain-exception-codes';
+} from 'src/module/user-accounts/constants/auth-tokens.inject-constants';
+import { DeviceSessionRepository } from 'src/module/user-accounts/infrastructure/device-session.repository';
+import { DeviceSession } from 'src/module/user-accounts/domain/device-session.entity';
+import { DomainException } from 'src/core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from 'src/core/exceptions/domain-exception-codes';
 
 export class RefreshTokenCommand {
   constructor(

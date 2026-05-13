@@ -1,8 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { ConfirmUserInputDto } from '@src/module/user-accounts/api/input-dto/confirm-user.input-dto';
-import { UsersRepository } from '@src/module/user-accounts/infrastructure/user.repository';
-import { DomainException } from '@core/exceptions/domain-exceptions';
-import { DomainExceptionCode } from '@core/exceptions/domain-exception-codes';
+import { ConfirmUserInputDto } from 'src/module/user-accounts/api/input-dto/confirm-user.input-dto';
+import { UsersRepository } from 'src/module/user-accounts/infrastructure/user.repository';
+import { DomainException } from 'src/core/exceptions/domain-exceptions';
+import { DomainExceptionCode } from 'src/core/exceptions/domain-exception-codes';
 
 export class ConfirmUserCommand {
   constructor(public dto: ConfirmUserInputDto) {}

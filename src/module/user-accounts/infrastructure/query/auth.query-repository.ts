@@ -2,12 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import User from '@src/module/user-accounts/domain/user.entity';
+import { DeviceSession } from '@src/module/user-accounts/domain/device-session.entity';
 
 @Injectable()
 export class AuthQueryRepository {
   constructor(
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
+    @InjectRepository(DeviceSession)
+    private readonly sessionsRepository: Repository<DeviceSession>,
   ) {}
 
   async getUserById(
@@ -21,5 +24,20 @@ export class AuthQueryRepository {
       login: user.login,
       userId: user.id,
     };
+  }
+
+  async getSessionsByUserId(
+    userId: string,
+  ): Promise<
+    { ip: string; title: string; lastActiveDate: string; deviceId: string }[]
+  > {
+    const sessions = await this.sessionsRepository.findBy({ userId });
+
+    return sessions.map((s) => ({
+      ip: s.ip,
+      title: '',
+      lastActiveDate: s.createdAt.toISOString(),
+      deviceId: s.deviceId,
+    }));
   }
 }
