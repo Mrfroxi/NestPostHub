@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { CoreModule } from '@core/core.module';
 import { UserAccountsModule } from '@src/module/user-accounts/user-accounts.module';
 import { NotificationsModule } from '@src/module/notification/notifications.module';
+import { TestingModule } from '@src/module/testing/testing.module';
 import { AllHttpExceptionsFilter } from '@core/exceptions/filters/all-exceptions.filter';
 import { DomainHttpExceptionsFilter } from '@core/exceptions/filters/domain-exceptions.filter';
 import { APP_FILTER } from '@nestjs/core';
@@ -17,6 +18,7 @@ import { APP_FILTER } from '@nestjs/core';
     CoreModule,
     UserAccountsModule,
     NotificationsModule,
+    TestingModule,
     TypeOrmModule.forRootAsync({
       useFactory: (config: CoreConfig) => ({
         type: 'postgres',
