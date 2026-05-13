@@ -20,7 +20,7 @@ export class JwtRefreshCookieGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
-    const token = this.extractRefreshTokenFromCookie(request);
+    const token = request.cookies?.refreshToken ?? null;
 
     if (!token) {
       throw new DomainException({
@@ -45,20 +45,5 @@ export class JwtRefreshCookieGuard implements CanActivate {
         ],
       });
     }
-  }
-
-  private extractRefreshTokenFromCookie(request: Request): string | null {
-    const cookieHeader = request.headers.cookie;
-    if (!cookieHeader) return null;
-
-    for (const part of cookieHeader.split(';')) {
-      const eqIdx = part.indexOf('=');
-      if (eqIdx === -1) continue;
-      if (part.substring(0, eqIdx).trim() === 'refreshToken') {
-        return part.substring(eqIdx + 1).trim();
-      }
-    }
-
-    return null;
   }
 }
