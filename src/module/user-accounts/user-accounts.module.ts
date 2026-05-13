@@ -11,9 +11,11 @@ import { ConfirmUserUseCase } from '@src/module/user-accounts/application/useCas
 import { RegistrationEmailResendingUseCase } from '@src/module/user-accounts/application/useCases/registration-email-resending.usecase';
 import { NewPasswordUseCase } from '@src/module/user-accounts/application/useCases/new-password.usecase';
 import { PasswordRecoveryEmailUseCase } from '@src/module/user-accounts/application/useCases/password-recovery.useCase';
+import { JwtStrategy } from '@src/module/user-accounts/guards/bearer/jwt.strategy';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [TypeOrmModule.forFeature([User]), PassportModule],
   controllers: [AuthController],
   providers: [
     UserAccountsConfig,
@@ -25,6 +27,7 @@ import { PasswordRecoveryEmailUseCase } from '@src/module/user-accounts/applicat
     RegistrationEmailResendingUseCase,
     PasswordRecoveryEmailUseCase,
     NewPasswordUseCase,
+    JwtStrategy,
   ],
 })
 export class UserAccountsModule {}
