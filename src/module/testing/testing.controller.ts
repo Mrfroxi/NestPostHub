@@ -12,9 +12,7 @@ export class TestingController {
 
     for (const entity of entities) {
       const repository = this.dataSource.getRepository(entity.name);
-      await repository.query(
-        `TRUNCATE TABLE "${entity.tableName}" CASCADE;`,
-      );
+      await repository.query(`TRUNCATE TABLE "${entity.tableName}" CASCADE;`);
     }
   }
 }

@@ -14,9 +14,7 @@ export class DeviceSessionRepository {
     return this.repo.save(session);
   }
 
-  async findByDeviceId(
-    deviceId: string,
-  ): Promise<DeviceSession | null> {
+  async findByDeviceId(deviceId: string): Promise<DeviceSession | null> {
     return this.repo.findOneBy({ deviceId });
   }
 

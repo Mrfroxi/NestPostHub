@@ -1,10 +1,4 @@
-import {
-  Body,
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserInputDto } from '@src/module/user-accounts/api/input-dto/create-user.input-dto';
 import { CreateUserCommand } from '../application/useCases/auth/create-user.usecase';

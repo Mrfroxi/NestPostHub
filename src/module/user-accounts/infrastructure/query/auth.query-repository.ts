@@ -51,9 +51,7 @@ export class AuthQueryRepository {
     }));
   }
 
-  async getUsersPaginated(
-    query: GetUsersQueryInputDto,
-  ): Promise<{
+  async getUsersPaginated(query: GetUsersQueryInputDto): Promise<{
     pagesCount: number;
     page: number;
     pageSize: number;

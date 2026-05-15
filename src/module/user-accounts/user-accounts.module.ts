@@ -36,7 +36,12 @@ import { UsersController } from './api/users.controller';
     JwtModule,
     PassportModule,
   ],
-  controllers: [AuthController, SecurityController, SaController, UsersController],
+  controllers: [
+    AuthController,
+    SecurityController,
+    SaController,
+    UsersController,
+  ],
   exports: [AuthQueryRepository, DeviceSessionRepository],
   providers: [
     UserAccountsConfig,
