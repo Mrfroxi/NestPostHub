@@ -19,8 +19,9 @@ import { UsersRepository } from '@src/module/user-accounts/infrastructure/user.r
 import { AuthQueryRepository } from '@src/module/user-accounts/infrastructure/query/auth.query-repository';
 import { DomainException } from '@core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '@core/exceptions/domain-exception-codes';
+import { DeleteUserDto } from '@src/module/user-accounts/api/input-dto/param.input-dto';
 
-@Controller('users')
+@Controller('sa')
 export class SaController {
   constructor(
     private commandBus: CommandBus,
@@ -29,7 +30,7 @@ export class SaController {
   ) {}
 
   @UseGuards(SABasicAuthGuard)
-  @Get('')
+  @Get('users')
   async getUsers(@Query() query: GetUsersQueryInputDto): Promise<{
     pagesCount: number;
     page: number;
@@ -41,7 +42,7 @@ export class SaController {
   }
 
   @UseGuards(SABasicAuthGuard)
-  @Post('')
+  @Post('users')
   @HttpCode(HttpStatus.CREATED)
   async createUser(
     @Body() body: CreateUserInputDto,
@@ -70,10 +71,10 @@ export class SaController {
   }
 
   @UseGuards(SABasicAuthGuard)
-  @Delete(':id')
+  @Delete('/users/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteUser(@Param('id') id: string): Promise<void> {
-    const user = await this.usersRepository.findById(id);
+  async deleteUser(@Param('id') param: DeleteUserDto): Promise<void> {
+    const user = await this.usersRepository.findById(param.id);
     if (!user) {
       throw new DomainException({
         code: DomainExceptionCode.NotFound,
@@ -82,6 +83,6 @@ export class SaController {
       });
     }
 
-    await this.usersRepository.deleteById(id);
+    await this.usersRepository.deleteById(param.id);
   }
 }

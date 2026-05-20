@@ -28,7 +28,6 @@ import { SecurityController } from './api/security.controller';
 import { TerminateSessionUseCase } from './application/useCases/security/terminate-session.usecase';
 import { TerminateOtherSessionsUseCase } from './application/useCases/security/terminate-other-sessions.usecase';
 import { SaController } from './api/sa.controller';
-import { UsersController } from './api/users.controller';
 
 @Module({
   imports: [
@@ -36,12 +35,7 @@ import { UsersController } from './api/users.controller';
     JwtModule,
     PassportModule,
   ],
-  controllers: [
-    AuthController,
-    SecurityController,
-    SaController,
-    UsersController,
-  ],
+  controllers: [AuthController, SecurityController, SaController],
   exports: [AuthQueryRepository, DeviceSessionRepository],
   providers: [
     UserAccountsConfig,
