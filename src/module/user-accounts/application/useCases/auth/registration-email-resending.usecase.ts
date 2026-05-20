@@ -22,7 +22,7 @@ export class RegistrationEmailResendingUseCase implements ICommandHandler<Regist
       throw new DomainException({
         code: DomainExceptionCode.BadRequest,
         message: `user not find`,
-        extensions: [{ message: `user not find`, field: 'user' }],
+        extensions: [{ message: `user not find`, field: 'email' }],
       });
     }
 

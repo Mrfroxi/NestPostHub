@@ -19,7 +19,6 @@ import { UsersRepository } from '@src/module/user-accounts/infrastructure/user.r
 import { AuthQueryRepository } from '@src/module/user-accounts/infrastructure/query/auth.query-repository';
 import { DomainException } from '@core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '@core/exceptions/domain-exception-codes';
-import { DeleteUserDto } from '@src/module/user-accounts/api/input-dto/param.input-dto';
 
 @Controller('sa')
 export class SaController {
@@ -73,8 +72,15 @@ export class SaController {
   @UseGuards(SABasicAuthGuard)
   @Delete('/users/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteUser(@Param('id') param: DeleteUserDto): Promise<void> {
-    const user = await this.usersRepository.findById(param.id);
+  async deleteUser(@Param('id') param: string): Promise<void> {
+    //for auto-test
+    if (!param || param.trim().length === 0) {
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'Id should not be empty',
+      });
+    }
+    const user = await this.usersRepository.findById(param);
     if (!user) {
       throw new DomainException({
         code: DomainExceptionCode.NotFound,
@@ -83,6 +89,6 @@ export class SaController {
       });
     }
 
-    await this.usersRepository.deleteById(param.id);
+    await this.usersRepository.deleteById(param);
   }
 }
