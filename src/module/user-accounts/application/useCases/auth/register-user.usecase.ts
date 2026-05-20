@@ -33,7 +33,7 @@ export class RegisterUserUseCase implements ICommandHandler<RegisterUserCommand>
       throw new DomainException({
         code: DomainExceptionCode.BadRequest,
         message: `user not find`,
-        extensions: [{ message: `user not find`, field: 'user' }],
+        extensions: [{ message: `user not find`, field: 'email' }],
       });
     }
 
