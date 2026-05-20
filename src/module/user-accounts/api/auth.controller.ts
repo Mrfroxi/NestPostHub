@@ -35,6 +35,7 @@ import { JwtAuthGuard } from '@src/module/user-accounts/guards/bearer/jwt-auth.g
 import { JwtRefreshCookieGuard } from '@src/module/user-accounts/guards/cookie/jwt-cookie.guard';
 import { CurrentUser } from '@core/decorators/current-user.decorator';
 import type { UserPayload } from '@core/decorators/current-user.decorator';
+import { RateLimitGuard } from '@src/module/rate-limit/guards/rate-limit.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -42,37 +43,37 @@ export class AuthController {
     private commandBus: CommandBus,
     private authQueryRepository: AuthQueryRepository,
   ) {}
-
+  @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration')
   registration(@Body() body: CreateUserInputDto) {
     return this.commandBus.execute(new RegisterUserCommand(body));
   }
-
+  @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-confirmation')
   registrationConfirmation(@Body() body: ConfirmUserInputDto) {
     return this.commandBus.execute(new ConfirmUserCommand(body));
   }
-
+  @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-email-resending')
   registrationEmailResending(@Body() body: RegistrationEmailResendingInputDto) {
     return this.commandBus.execute(new RegistrationEmailResendingCommand(body));
   }
-
+  @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('password-recovery')
   PasswordRecovery(@Body() body: PasswordRecoveryDto) {
     return this.commandBus.execute(new PasswordRecoveryCommand(body));
   }
-
+  @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('new-password')
   newPassword(@Body() body: PasswordInputDto) {
     return this.commandBus.execute(new NewPasswordCommand(body));
   }
-
+  @UseGuards(RateLimitGuard)
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(
