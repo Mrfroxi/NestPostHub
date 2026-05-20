@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, ILike } from 'typeorm';
+import { Repository } from 'typeorm';
 import User from '@src/module/user-accounts/domain/user.entity';
 import { DeviceSession } from '@src/module/user-accounts/domain/device-session.entity';
 import { GetUsersQueryInputDto } from '@src/module/user-accounts/api/input-dto/get-users-query.input-dto';
@@ -58,32 +58,41 @@ export class AuthQueryRepository {
     totalCount: number;
     items: UserOutputDto[];
   }> {
-    const where: any = [];
-
-    if (query.searchLoginTerm || query.searchEmailTerm) {
-      const conditions: any[] = [];
-
-      if (query.searchLoginTerm) {
-        conditions.push({ login: ILike(`%${query.searchLoginTerm}%`) });
-      }
-
-      if (query.searchEmailTerm) {
-        conditions.push({ email: ILike(`%${query.searchEmailTerm}%`) });
-      }
-
-      where.push(...conditions);
-    }
-
     const sortBy = this.allowedSortFields.includes(query.sortBy)
       ? query.sortBy
       : 'createdAt';
 
-    const [users, totalCount] = await this.usersRepository.findAndCount({
-      where,
-      order: { [sortBy]: query.sortDirection.toUpperCase() },
-      skip: (query.pageNumber - 1) * query.pageSize,
-      take: query.pageSize,
-    });
+    const direction = query.sortDirection.toUpperCase() as 'ASC' | 'DESC';
+
+    const queryBuilder = this.usersRepository.createQueryBuilder('u');
+
+    if (query.searchLoginTerm || query.searchEmailTerm) {
+      if (query.searchLoginTerm && query.searchEmailTerm) {
+        queryBuilder.where('u.login ILIKE :login OR u.email ILIKE :email', {
+          login: `%${query.searchLoginTerm}%`,
+          email: `%${query.searchEmailTerm}%`,
+        });
+      } else if (query.searchLoginTerm) {
+        queryBuilder.where('u.login ILIKE :login', {
+          login: `%${query.searchLoginTerm}%`,
+        });
+      } else if (query.searchEmailTerm) {
+        queryBuilder.where('u.email ILIKE :email', {
+          email: `%${query.searchEmailTerm}%`,
+        });
+      }
+    }
+
+    if (sortBy === 'login' || sortBy === 'email') {
+      queryBuilder.orderBy(`u.${sortBy} COLLATE "C"`, direction);
+    } else {
+      queryBuilder.orderBy(`u.${sortBy}`, direction);
+    }
+
+    const [users, totalCount] = await queryBuilder
+      .skip((query.pageNumber - 1) * query.pageSize)
+      .take(query.pageSize)
+      .getManyAndCount();
 
     return {
       pagesCount: Math.ceil(totalCount / query.pageSize),
