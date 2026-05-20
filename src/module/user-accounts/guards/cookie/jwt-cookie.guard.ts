@@ -22,7 +22,7 @@ export class JwtRefreshCookieGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
-    const token = request.cookies?.refreshToken ?? null;
+    const token: string = request.cookies?.refreshToken ?? null;
 
     if (!token) {
       throw new DomainException({
@@ -47,9 +47,10 @@ export class JwtRefreshCookieGuard implements CanActivate {
       });
     }
 
-    const session = await this.deviceSessionRepository.findByDeviceIdAndUserId(
+    const session = await this.deviceSessionRepository.validateSession(
       payload.deviceId,
       payload.userId,
+      token,
     );
 
     if (!session) {

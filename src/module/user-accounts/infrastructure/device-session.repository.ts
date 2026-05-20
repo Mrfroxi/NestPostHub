@@ -24,6 +24,13 @@ export class DeviceSessionRepository {
   ): Promise<DeviceSession | null> {
     return this.repo.findOneBy({ deviceId, userId });
   }
+  async validateSession(
+    deviceId: string,
+    userId: string,
+    refreshToken: string,
+  ): Promise<DeviceSession | null> {
+    return this.repo.findOneBy({ deviceId, userId, refreshToken });
+  }
 
   async deleteByDeviceIdAndUserId(
     deviceId: string,
