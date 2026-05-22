@@ -43,37 +43,37 @@ export class AuthController {
     private commandBus: CommandBus,
     private authQueryRepository: AuthQueryRepository,
   ) {}
-  @UseGuards(RateLimitGuard)
+  // @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration')
   registration(@Body() body: CreateUserInputDto) {
     return this.commandBus.execute(new RegisterUserCommand(body));
   }
-  @UseGuards(RateLimitGuard)
+  // @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-confirmation')
   registrationConfirmation(@Body() body: ConfirmUserInputDto) {
     return this.commandBus.execute(new ConfirmUserCommand(body));
   }
-  @UseGuards(RateLimitGuard)
+  // @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('registration-email-resending')
   registrationEmailResending(@Body() body: RegistrationEmailResendingInputDto) {
     return this.commandBus.execute(new RegistrationEmailResendingCommand(body));
   }
-  @UseGuards(RateLimitGuard)
+  // @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('password-recovery')
   PasswordRecovery(@Body() body: PasswordRecoveryDto) {
     return this.commandBus.execute(new PasswordRecoveryCommand(body));
   }
-  @UseGuards(RateLimitGuard)
+  // @UseGuards(RateLimitGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('new-password')
   newPassword(@Body() body: PasswordInputDto) {
     return this.commandBus.execute(new NewPasswordCommand(body));
   }
-  @UseGuards(RateLimitGuard)
+  // @UseGuards(RateLimitGuard)
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(

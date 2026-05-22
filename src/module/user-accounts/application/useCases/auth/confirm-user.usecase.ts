@@ -23,6 +23,14 @@ export class ConfirmUserUseCase implements ICommandHandler<ConfirmUserCommand> {
       });
     }
 
+    if (user.isConfirmed) {
+      throw new DomainException({
+        code: DomainExceptionCode.BadRequest,
+        message: `code already confirmed`,
+        extensions: [{ message: `code already confirmed`, field: 'code' }],
+      });
+    }
+
     user.setConfirmed();
     await this.usersRepository.save(user);
   }

@@ -30,7 +30,7 @@ export class RegistrationEmailResendingUseCase implements ICommandHandler<Regist
       throw new DomainException({
         code: DomainExceptionCode.BadRequest,
         message: `user confirmed`,
-        extensions: [{ message: `user confirmed`, field: 'isConfirmed' }],
+        extensions: [{ message: `user confirmed`, field: 'email' }],
       });
     }
 
