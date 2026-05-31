@@ -12,6 +12,12 @@ import { SABasicAuthGuard } from '@src/module/sa/guards/sa-basic-auth.guard';
 @Module({
   imports: [UserAccountsModule, BlogModule],
   controllers: [SaUserController, SaBlogsController],
-  providers: [CreateBlogUseCase, UpdateBlogUseCase, DeleteBlogUseCase, SaConfig, SABasicAuthGuard],
+  providers: [
+    CreateBlogUseCase,
+    UpdateBlogUseCase,
+    DeleteBlogUseCase,
+    SaConfig,
+    SABasicAuthGuard,
+  ],
 })
 export class SaModule {}

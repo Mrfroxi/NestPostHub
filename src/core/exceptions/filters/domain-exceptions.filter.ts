@@ -16,9 +16,14 @@ export class DomainHttpExceptionsFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
 
     const status = this.mapToHttpStatus(exception.code);
-    const responseBody = this.buildResponseBody(exception);
+    const responseBody: ErrorDomainResponseBody | null =
+      this.buildResponseBody(exception);
 
-    response.status(status).json(responseBody);
+    if (!responseBody) {
+      response.sendStatus(status);
+    } else {
+      response.status(status).json(responseBody);
+    }
   }
 
   private mapToHttpStatus(code: DomainExceptionCode): number {
@@ -46,9 +51,11 @@ export class DomainHttpExceptionsFilter implements ExceptionFilter {
 
   private buildResponseBody(
     exception: DomainException,
-  ): ErrorDomainResponseBody {
-    return {
-      errorsMessages: exception.extensions,
-    };
+  ): ErrorDomainResponseBody | null {
+    if (exception.extensions.length > 0) {
+      return { errorsMessages: exception.extensions };
+    }
+
+    return null;
   }
 }

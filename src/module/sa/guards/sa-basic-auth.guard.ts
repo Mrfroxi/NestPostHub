@@ -16,6 +16,7 @@ export class SABasicAuthGuard implements CanActivate {
       throw new DomainException({
         code: DomainExceptionCode.Unauthorized,
         message: 'Unauthorized',
+        // extensions: [{ message: `Unauthorized`, field: 'Basic' }],
       });
     }
 
