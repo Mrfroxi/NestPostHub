@@ -1,0 +1,15 @@
+import { Module } from '@nestjs/common';
+import { UserAccountsModule } from '@src/module/user-accounts/user-accounts.module';
+import { BlogModule } from '@src/module/blog/blog.module';
+import { SaUserController } from '@src/module/sa/api/sa-user.controller';
+import { SaBlogsController } from '@src/module/sa/api/sa-blogs.controller';
+import { CreateBlogUseCase } from '@src/module/sa/application/useCases/create-blog.usecase';
+import { SaConfig } from '@src/module/sa/config/sa.config';
+import { SABasicAuthGuard } from '@src/module/sa/guards/sa-basic-auth.guard';
+
+@Module({
+  imports: [UserAccountsModule, BlogModule],
+  controllers: [SaUserController, SaBlogsController],
+  providers: [CreateBlogUseCase, SaConfig, SABasicAuthGuard],
+})
+export class SaModule {}
