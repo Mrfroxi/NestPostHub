@@ -2,21 +2,27 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpCode,
   HttpStatus,
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { SABasicAuthGuard } from '@src/module/sa/guards/sa-basic-auth.guard';
 import { CreateBlogInputDto } from '@src/module/sa/api/input-dto/create-blog.input-dto';
 import { UpdateBlogInputDto } from '@src/module/sa/api/input-dto/update-blog.input-dto';
+import { GetBlogsQueryInputDto } from '@src/module/sa/api/input-dto/get-blogs-query.input-dto';
 import { CreateBlogCommand } from '@src/module/sa/application/useCases/create-blog.usecase';
 import { UpdateBlogCommand } from '@src/module/sa/application/useCases/update-blog.usecase';
 import { DeleteBlogCommand } from '@src/module/sa/application/useCases/delete-blog.usecase';
-import { BlogQueryRepository } from '@src/module/blog/infrastructure/query/blog.query-repository';
+import {
+  BlogQueryRepository,
+  PaginatedBlogsDto,
+} from '@src/module/blog/infrastructure/query/blog.query-repository';
 import { DomainException } from '@core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '@core/exceptions/domain-exception-codes';
 
@@ -26,6 +32,15 @@ export class SaBlogsController {
     private commandBus: CommandBus,
     private blogQueryRepository: BlogQueryRepository,
   ) {}
+
+  @UseGuards(SABasicAuthGuard)
+  @Get()
+  async getBlogs(@Query() query: GetBlogsQueryInputDto) {
+    const blogs: PaginatedBlogsDto =
+      await this.blogQueryRepository.getBlogsPaginated(query);
+
+    return blogs;
+  }
 
   @UseGuards(SABasicAuthGuard)
   @Post()
