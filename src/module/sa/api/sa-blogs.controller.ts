@@ -16,12 +16,14 @@ import { SABasicAuthGuard } from '@src/module/sa/guards/sa-basic-auth.guard';
 import { CreateBlogInputDto } from '@src/module/sa/api/input-dto/create-blog.input-dto';
 import { UpdateBlogInputDto } from '@src/module/sa/api/input-dto/update-blog.input-dto';
 import { CreatePostInputDto } from '@src/module/sa/api/input-dto/create-post.input-dto';
+import { UpdatePostInputDto } from '@src/module/sa/api/input-dto/update-post.input-dto';
 import { GetBlogsQueryInputDto } from '@src/module/sa/api/input-dto/get-blogs-query.input-dto';
 import { GetPostsQueryInputDto } from '@src/module/sa/api/input-dto/get-posts-query.input-dto';
 import { CreateBlogCommand } from '@src/module/sa/application/useCases/create-blog.usecase';
 import { UpdateBlogCommand } from '@src/module/sa/application/useCases/update-blog.usecase';
 import { DeleteBlogCommand } from '@src/module/sa/application/useCases/delete-blog.usecase';
 import { CreatePostCommand } from '@src/module/sa/application/useCases/create-post.usecase';
+import { UpdatePostCommand } from '@src/module/sa/application/useCases/update-post.usecase';
 import {
   BlogQueryRepository,
   PaginatedBlogsDto,
@@ -112,6 +114,17 @@ export class SaBlogsController {
     }
 
     return post;
+  }
+
+  @UseGuards(SABasicAuthGuard)
+  @Put(':blogId/posts/:postId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updatePost(
+    @Param('blogId') blogId: string,
+    @Param('postId') postId: string,
+    @Body() body: UpdatePostInputDto,
+  ): Promise<void> {
+    await this.commandBus.execute(new UpdatePostCommand(blogId, postId, body));
   }
 
   @UseGuards(SABasicAuthGuard)
