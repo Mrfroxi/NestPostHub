@@ -18,7 +18,7 @@ import { UpdateBlogInputDto } from '@src/module/sa/api/input-dto/update-blog.inp
 import { CreatePostInputDto } from '@src/module/sa/api/input-dto/create-post.input-dto';
 import { UpdatePostInputDto } from '@src/module/sa/api/input-dto/update-post.input-dto';
 import { GetBlogsQueryInputDto } from '@src/module/blog/api/input-dto/get-blogs-query.input-dto';
-import { GetPostsQueryInputDto } from '@src/module/sa/api/input-dto/get-posts-query.input-dto';
+import { GetPostsQueryInputDto } from '@src/module/blog/api/input-dto/get-posts-query.input-dto';
 import { CreateBlogCommand } from '@src/module/sa/application/useCases/create-blog.usecase';
 import { UpdateBlogCommand } from '@src/module/sa/application/useCases/update-blog.usecase';
 import { DeleteBlogCommand } from '@src/module/sa/application/useCases/delete-blog.usecase';

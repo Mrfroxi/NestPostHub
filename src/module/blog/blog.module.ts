@@ -7,10 +7,11 @@ import { BlogQueryRepository } from '@src/module/blog/infrastructure/query/blog.
 import { PostRepository } from '@src/module/blog/infrastructure/post.repository';
 import { PostQueryRepository } from '@src/module/blog/infrastructure/query/post.query-repository';
 import { BlogsController } from '@src/module/blog/api/blogs.controller';
+import { PostsController } from '@src/module/blog/api/posts.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Blog, Post])],
-  controllers: [BlogsController],
+  controllers: [BlogsController, PostsController],
   exports: [
     BlogQueryRepository,
     BlogRepository,

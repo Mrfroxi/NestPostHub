@@ -8,7 +8,7 @@ import {
 import { GetBlogsQueryInputDto } from '@src/module/blog/api/input-dto/get-blogs-query.input-dto';
 import { PostQueryRepository } from '@src/module/blog/infrastructure/query/post.query-repository';
 import { BlogRepository } from '@src/module/blog/infrastructure/blog.repository';
-import { GetPostsQueryInputDto } from '@src/module/sa/api/input-dto/get-posts-query.input-dto';
+import { GetPostsQueryInputDto } from '@src/module/blog/api/input-dto/get-posts-query.input-dto';
 import { DomainException } from '@core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '@core/exceptions/domain-exception-codes';
 

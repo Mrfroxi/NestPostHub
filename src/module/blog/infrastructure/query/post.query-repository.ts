@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import Post from '@src/module/blog/domain/post.entity';
-import { GetPostsQueryInputDto } from '@src/module/sa/api/input-dto/get-posts-query.input-dto';
+import { GetPostsQueryInputDto } from '@src/module/blog/api/input-dto/get-posts-query.input-dto';
 
 export type NewestLike = {
   addedAt: string;
@@ -84,6 +84,47 @@ export class PostQueryRepository {
     const queryBuilder = this.postsRepository.createQueryBuilder('p');
 
     queryBuilder.where('p.blogId = :blogId', { blogId });
+
+    queryBuilder.orderBy(`p.${sortBy}`, direction);
+
+    const [posts, totalCount] = await queryBuilder
+      .skip((query.pageNumber - 1) * query.pageSize)
+      .take(query.pageSize)
+      .getManyAndCount();
+
+    return {
+      pagesCount: Math.ceil(totalCount / query.pageSize),
+      page: query.pageNumber,
+      pageSize: query.pageSize,
+      totalCount,
+      items: posts.map((p) => ({
+        id: p.id,
+        title: p.title,
+        shortDescription: p.shortDescription,
+        content: p.content,
+        blogId: p.blogId,
+        blogName: p.blogName,
+        createdAt: p.createdAt.toISOString(),
+        extendedLikesInfo: {
+          likesCount: 0,
+          dislikesCount: 0,
+          myStatus: 'None',
+          newestLikes: [],
+        },
+      })),
+    };
+  }
+
+  async getAllPostsPaginated(
+    query: GetPostsQueryInputDto,
+  ): Promise<PaginatedPostsDto> {
+    const sortBy = this.allowedSortFields.includes(query.sortBy)
+      ? query.sortBy
+      : 'createdAt';
+
+    const direction = query.sortDirection.toUpperCase() as 'ASC' | 'DESC';
+
+    const queryBuilder = this.postsRepository.createQueryBuilder('p');
 
     queryBuilder.orderBy(`p.${sortBy}`, direction);
 
