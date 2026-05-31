@@ -4,12 +4,13 @@ import { BlogModule } from '@src/module/blog/blog.module';
 import { SaUserController } from '@src/module/sa/api/sa-user.controller';
 import { SaBlogsController } from '@src/module/sa/api/sa-blogs.controller';
 import { CreateBlogUseCase } from '@src/module/sa/application/useCases/create-blog.usecase';
+import { UpdateBlogUseCase } from '@src/module/sa/application/useCases/update-blog.usecase';
 import { SaConfig } from '@src/module/sa/config/sa.config';
 import { SABasicAuthGuard } from '@src/module/sa/guards/sa-basic-auth.guard';
 
 @Module({
   imports: [UserAccountsModule, BlogModule],
   controllers: [SaUserController, SaBlogsController],
-  providers: [CreateBlogUseCase, SaConfig, SABasicAuthGuard],
+  providers: [CreateBlogUseCase, UpdateBlogUseCase, SaConfig, SABasicAuthGuard],
 })
 export class SaModule {}

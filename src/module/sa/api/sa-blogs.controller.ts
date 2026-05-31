@@ -3,13 +3,17 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { SABasicAuthGuard } from '@src/module/sa/guards/sa-basic-auth.guard';
 import { CreateBlogInputDto } from '@src/module/sa/api/input-dto/create-blog.input-dto';
+import { UpdateBlogInputDto } from '@src/module/sa/api/input-dto/update-blog.input-dto';
 import { CreateBlogCommand } from '@src/module/sa/application/useCases/create-blog.usecase';
+import { UpdateBlogCommand } from '@src/module/sa/application/useCases/update-blog.usecase';
 import { BlogQueryRepository } from '@src/module/blog/infrastructure/query/blog.query-repository';
 import { DomainException } from '@core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '@core/exceptions/domain-exception-codes';
@@ -41,5 +45,15 @@ export class SaBlogsController {
     }
 
     return blog;
+  }
+
+  @UseGuards(SABasicAuthGuard)
+  @Put(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async updateBlog(
+    @Param('id') id: string,
+    @Body() body: UpdateBlogInputDto,
+  ): Promise<void> {
+    await this.commandBus.execute(new UpdateBlogCommand(id, body));
   }
 }
