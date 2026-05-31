@@ -9,6 +9,7 @@ import { UserAccountsModule } from '@src/module/user-accounts/user-accounts.modu
 import { NotificationsModule } from '@src/module/notification/notifications.module';
 import { TestingModule } from '@src/module/testing/testing.module';
 import { RateLimitModule } from '@src/module/rate-limit/rate-limit.module';
+import { BlogModule } from '@src/module/blog/blog.module';
 import { AllHttpExceptionsFilter } from '@core/exceptions/filters/all-exceptions.filter';
 import { DomainHttpExceptionsFilter } from '@core/exceptions/filters/domain-exceptions.filter';
 import { APP_FILTER } from '@nestjs/core';
@@ -21,6 +22,7 @@ import { APP_FILTER } from '@nestjs/core';
     NotificationsModule,
     TestingModule,
     RateLimitModule,
+    BlogModule,
     TypeOrmModule.forRootAsync({
       useFactory: (config: CoreConfig) => ({
         type: 'postgres',
