@@ -8,6 +8,7 @@ import { UpdateBlogUseCase } from '@src/module/sa/application/useCases/update-bl
 import { DeleteBlogUseCase } from '@src/module/sa/application/useCases/delete-blog.usecase';
 import { CreatePostUseCase } from '@src/module/sa/application/useCases/create-post.usecase';
 import { UpdatePostUseCase } from '@src/module/sa/application/useCases/update-post.usecase';
+import { DeletePostUseCase } from '@src/module/sa/application/useCases/delete-post.usecase';
 import { SaConfig } from '@src/module/sa/config/sa.config';
 import { SABasicAuthGuard } from '@src/module/sa/guards/sa-basic-auth.guard';
 
@@ -20,6 +21,7 @@ import { SABasicAuthGuard } from '@src/module/sa/guards/sa-basic-auth.guard';
     DeleteBlogUseCase,
     CreatePostUseCase,
     UpdatePostUseCase,
+    DeletePostUseCase,
     SaConfig,
     SABasicAuthGuard,
   ],

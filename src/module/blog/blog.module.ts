@@ -11,7 +11,17 @@ import { BlogsController } from '@src/module/blog/api/blogs.controller';
 @Module({
   imports: [TypeOrmModule.forFeature([Blog, Post])],
   controllers: [BlogsController],
-  exports: [BlogQueryRepository, BlogRepository, PostQueryRepository, PostRepository],
-  providers: [BlogRepository, BlogQueryRepository, PostRepository, PostQueryRepository],
+  exports: [
+    BlogQueryRepository,
+    BlogRepository,
+    PostQueryRepository,
+    PostRepository,
+  ],
+  providers: [
+    BlogRepository,
+    BlogQueryRepository,
+    PostRepository,
+    PostQueryRepository,
+  ],
 })
 export class BlogModule {}

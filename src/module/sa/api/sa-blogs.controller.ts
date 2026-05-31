@@ -24,6 +24,7 @@ import { UpdateBlogCommand } from '@src/module/sa/application/useCases/update-bl
 import { DeleteBlogCommand } from '@src/module/sa/application/useCases/delete-blog.usecase';
 import { CreatePostCommand } from '@src/module/sa/application/useCases/create-post.usecase';
 import { UpdatePostCommand } from '@src/module/sa/application/useCases/update-post.usecase';
+import { DeletePostCommand } from '@src/module/sa/application/useCases/delete-post.usecase';
 import {
   BlogQueryRepository,
   PaginatedBlogsDto,
@@ -142,5 +143,15 @@ export class SaBlogsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBlog(@Param('id') id: string): Promise<void> {
     await this.commandBus.execute(new DeleteBlogCommand(id));
+  }
+
+  @UseGuards(SABasicAuthGuard)
+  @Delete(':blogId/posts/:postId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deletePost(
+    @Param('blogId') blogId: string,
+    @Param('postId') postId: string,
+  ): Promise<void> {
+    await this.commandBus.execute(new DeletePostCommand(blogId, postId));
   }
 }
