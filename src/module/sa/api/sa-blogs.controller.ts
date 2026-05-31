@@ -15,14 +15,19 @@ import { CommandBus } from '@nestjs/cqrs';
 import { SABasicAuthGuard } from '@src/module/sa/guards/sa-basic-auth.guard';
 import { CreateBlogInputDto } from '@src/module/sa/api/input-dto/create-blog.input-dto';
 import { UpdateBlogInputDto } from '@src/module/sa/api/input-dto/update-blog.input-dto';
+import { CreatePostInputDto } from '@src/module/sa/api/input-dto/create-post.input-dto';
 import { GetBlogsQueryInputDto } from '@src/module/sa/api/input-dto/get-blogs-query.input-dto';
+import { GetPostsQueryInputDto } from '@src/module/sa/api/input-dto/get-posts-query.input-dto';
 import { CreateBlogCommand } from '@src/module/sa/application/useCases/create-blog.usecase';
 import { UpdateBlogCommand } from '@src/module/sa/application/useCases/update-blog.usecase';
 import { DeleteBlogCommand } from '@src/module/sa/application/useCases/delete-blog.usecase';
+import { CreatePostCommand } from '@src/module/sa/application/useCases/create-post.usecase';
 import {
   BlogQueryRepository,
   PaginatedBlogsDto,
 } from '@src/module/blog/infrastructure/query/blog.query-repository';
+import { PostQueryRepository } from '@src/module/blog/infrastructure/query/post.query-repository';
+import { BlogRepository } from '@src/module/blog/infrastructure/blog.repository';
 import { DomainException } from '@core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '@core/exceptions/domain-exception-codes';
 
@@ -31,6 +36,8 @@ export class SaBlogsController {
   constructor(
     private commandBus: CommandBus,
     private blogQueryRepository: BlogQueryRepository,
+    private postQueryRepository: PostQueryRepository,
+    private blogRepository: BlogRepository,
   ) {}
 
   @UseGuards(SABasicAuthGuard)
@@ -40,6 +47,24 @@ export class SaBlogsController {
       await this.blogQueryRepository.getBlogsPaginated(query);
 
     return blogs;
+  }
+
+  @UseGuards(SABasicAuthGuard)
+  @Get(':blogId/posts')
+  async getPostsForBlog(
+    @Param('blogId') blogId: string,
+    @Query() query: GetPostsQueryInputDto,
+  ) {
+    const blog = await this.blogRepository.findById(blogId);
+    if (!blog) {
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'Blog not found',
+        extensions: [{ message: 'Blog not found', field: 'blogId' }],
+      });
+    }
+
+    return this.postQueryRepository.getPostsForBlogPaginated(blogId, query);
   }
 
   @UseGuards(SABasicAuthGuard)
@@ -62,6 +87,31 @@ export class SaBlogsController {
     }
 
     return blog;
+  }
+
+  @UseGuards(SABasicAuthGuard)
+  @HttpCode(HttpStatus.CREATED)
+  @Post(':blogId/posts')
+  async createPost(
+    @Param('blogId') blogId: string,
+    @Body() body: CreatePostInputDto,
+  ) {
+    const postId: string = await this.commandBus.execute(
+      new CreatePostCommand(blogId, body),
+    );
+
+    const post = await this.postQueryRepository.findById(postId);
+    if (!post) {
+      throw new DomainException({
+        code: DomainExceptionCode.InternalServerError,
+        message: 'Post not found after creation',
+        extensions: [
+          { message: 'Post not found after creation', field: 'postId' },
+        ],
+      });
+    }
+
+    return post;
   }
 
   @UseGuards(SABasicAuthGuard)

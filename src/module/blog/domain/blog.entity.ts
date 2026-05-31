@@ -3,7 +3,9 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import Post from './post.entity';
 
 @Entity('blogs')
 class Blog {
@@ -24,6 +26,9 @@ class Blog {
 
   @Column({ type: 'boolean', default: false, nullable: false })
   isMembership: boolean;
+
+  @OneToMany(() => Post, (post) => post.blog)
+  posts: Post[];
 
   static create(payload: {
     name: string;

@@ -6,6 +6,7 @@ import { SaBlogsController } from '@src/module/sa/api/sa-blogs.controller';
 import { CreateBlogUseCase } from '@src/module/sa/application/useCases/create-blog.usecase';
 import { UpdateBlogUseCase } from '@src/module/sa/application/useCases/update-blog.usecase';
 import { DeleteBlogUseCase } from '@src/module/sa/application/useCases/delete-blog.usecase';
+import { CreatePostUseCase } from '@src/module/sa/application/useCases/create-post.usecase';
 import { SaConfig } from '@src/module/sa/config/sa.config';
 import { SABasicAuthGuard } from '@src/module/sa/guards/sa-basic-auth.guard';
 
@@ -16,6 +17,7 @@ import { SABasicAuthGuard } from '@src/module/sa/guards/sa-basic-auth.guard';
     CreateBlogUseCase,
     UpdateBlogUseCase,
     DeleteBlogUseCase,
+    CreatePostUseCase,
     SaConfig,
     SABasicAuthGuard,
   ],
