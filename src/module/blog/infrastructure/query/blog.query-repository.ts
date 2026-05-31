@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import Blog from '@src/module/blog/domain/blog.entity';
-import { GetBlogsQueryInputDto } from '@src/module/sa/api/input-dto/get-blogs-query.input-dto';
+import { GetBlogsQueryInputDto } from '@src/module/blog/api/input-dto/get-blogs-query.input-dto';
 
 export type BlogOutputDto = {
   id: string;
