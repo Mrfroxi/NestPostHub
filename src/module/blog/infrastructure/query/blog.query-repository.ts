@@ -66,7 +66,13 @@ export class BlogQueryRepository {
       });
     }
 
-    queryBuilder.orderBy(`b.${sortBy}`, direction);
+    const stringFields = ['name', 'description', 'websiteUrl'];
+
+    if (stringFields.includes(sortBy)) {
+      queryBuilder.orderBy(`b.${sortBy} COLLATE "C"`, direction);
+    } else {
+      queryBuilder.orderBy(`b.${sortBy}`, direction);
+    }
 
     const [blogs, totalCount] = await queryBuilder
       .skip((query.pageNumber - 1) * query.pageSize)

@@ -43,6 +43,7 @@ export class PostQueryRepository {
     'title',
     'shortDescription',
     'content',
+    'blogName',
   ];
 
   constructor(
@@ -85,7 +86,18 @@ export class PostQueryRepository {
 
     queryBuilder.where('p.blogId = :blogId', { blogId });
 
-    queryBuilder.orderBy(`p.${sortBy}`, direction);
+    if (sortBy === 'blogName') {
+      queryBuilder
+        .orderBy(`p.${sortBy} COLLATE "C"`, direction)
+        .addOrderBy(
+          `CAST(COALESCE(NULLIF(SUBSTRING(p.${sortBy} FROM '\\d+$'), ''), '0') AS INTEGER)`,
+          direction,
+        );
+    } else if (['title', 'shortDescription', 'content'].includes(sortBy)) {
+      queryBuilder.orderBy(`p.${sortBy} COLLATE "C"`, direction);
+    } else {
+      queryBuilder.orderBy(`p.${sortBy}`, direction);
+    }
 
     const [posts, totalCount] = await queryBuilder
       .skip((query.pageNumber - 1) * query.pageSize)
@@ -126,7 +138,18 @@ export class PostQueryRepository {
 
     const queryBuilder = this.postsRepository.createQueryBuilder('p');
 
-    queryBuilder.orderBy(`p.${sortBy}`, direction);
+    if (sortBy === 'blogName') {
+      queryBuilder
+        .orderBy(`p.${sortBy} COLLATE "C"`, direction)
+        .addOrderBy(
+          `CAST(COALESCE(NULLIF(SUBSTRING(p.${sortBy} FROM '\\d+$'), ''), '0') AS INTEGER)`,
+          direction,
+        );
+    } else if (['title', 'shortDescription', 'content'].includes(sortBy)) {
+      queryBuilder.orderBy(`p.${sortBy} COLLATE "C"`, direction);
+    } else {
+      queryBuilder.orderBy(`p.${sortBy}`, direction);
+    }
 
     const [posts, totalCount] = await queryBuilder
       .skip((query.pageNumber - 1) * query.pageSize)
