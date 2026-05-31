@@ -17,4 +17,8 @@ export class BlogRepository {
   async save(blog: Blog): Promise<Blog> {
     return this.blogsRepository.save(blog);
   }
+
+  async deleteById(id: string): Promise<void> {
+    await this.blogsRepository.delete(id);
+  }
 }

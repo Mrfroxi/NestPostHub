@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   HttpCode,
   HttpStatus,
   Param,
@@ -14,6 +15,7 @@ import { CreateBlogInputDto } from '@src/module/sa/api/input-dto/create-blog.inp
 import { UpdateBlogInputDto } from '@src/module/sa/api/input-dto/update-blog.input-dto';
 import { CreateBlogCommand } from '@src/module/sa/application/useCases/create-blog.usecase';
 import { UpdateBlogCommand } from '@src/module/sa/application/useCases/update-blog.usecase';
+import { DeleteBlogCommand } from '@src/module/sa/application/useCases/delete-blog.usecase';
 import { BlogQueryRepository } from '@src/module/blog/infrastructure/query/blog.query-repository';
 import { DomainException } from '@core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '@core/exceptions/domain-exception-codes';
@@ -55,5 +57,12 @@ export class SaBlogsController {
     @Body() body: UpdateBlogInputDto,
   ): Promise<void> {
     await this.commandBus.execute(new UpdateBlogCommand(id, body));
+  }
+
+  @UseGuards(SABasicAuthGuard)
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteBlog(@Param('id') id: string): Promise<void> {
+    await this.commandBus.execute(new DeleteBlogCommand(id));
   }
 }
