@@ -14,10 +14,11 @@ export class CreateBlogUseCase implements ICommandHandler<CreateBlogCommand> {
   async execute(command: CreateBlogCommand): Promise<string> {
     const { dto } = command;
 
-    const blog = new Blog();
-    blog.name = dto.name;
-    blog.description = dto.description;
-    blog.websiteUrl = dto.websiteUrl;
+    const blog = Blog.create({
+      name: dto.name,
+      description: dto.description,
+      websiteUrl: dto.websiteUrl,
+    });
 
     const savedBlog = await this.blogRepository.save(blog);
     return savedBlog.id;

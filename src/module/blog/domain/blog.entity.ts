@@ -24,6 +24,18 @@ class Blog {
 
   @Column({ type: 'boolean', default: false, nullable: false })
   isMembership: boolean;
+
+  static create(payload: {
+    name: string;
+    description: string;
+    websiteUrl: string;
+  }): Blog {
+    const blog = new Blog();
+    blog.name = payload.name;
+    blog.description = payload.description;
+    blog.websiteUrl = payload.websiteUrl;
+    return blog;
+  }
 }
 
 export default Blog;
