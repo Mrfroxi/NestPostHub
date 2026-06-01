@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { BlogIdParamDto } from '@src/module/blog/api/input-dto/blog-id.param-dto';
 import {
   BlogOutputDto,
@@ -11,6 +11,11 @@ import { BlogRepository } from '@src/module/blog/infrastructure/blog.repository'
 import { GetPostsQueryInputDto } from '@src/module/blog/api/input-dto/get-posts-query.input-dto';
 import { DomainException } from '@core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '@core/exceptions/domain-exception-codes';
+import { OptionalJwtAuthGuard } from '@src/module/blog/guards/optional-jwt-auth.guard';
+import {
+  CurrentUser,
+  type UserPayload,
+} from '@core/decorators/current-user.decorator';
 
 @Controller('blogs')
 export class BlogsController {
@@ -44,10 +49,12 @@ export class BlogsController {
     return blog;
   }
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Get(':blogId/posts')
   async getPostsForBlog(
     @Param('blogId') blogId: string,
     @Query() query: GetPostsQueryInputDto,
+    @CurrentUser() user?: UserPayload,
   ) {
     const blog = await this.blogRepository.findById(blogId);
     if (!blog) {
@@ -58,6 +65,10 @@ export class BlogsController {
       });
     }
 
-    return this.postQueryRepository.getPostsForBlogPaginated(blogId, query);
+    return this.postQueryRepository.getPostsForBlogPaginated(
+      blogId,
+      query,
+      user?.userId,
+    );
   }
 }
