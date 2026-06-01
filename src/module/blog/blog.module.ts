@@ -11,12 +11,13 @@ import { CommentRepository } from '@src/module/blog/infrastructure/comment.repos
 import { CommentQueryRepository } from '@src/module/blog/infrastructure/query/comment.query-repository';
 import { BlogsController } from '@src/module/blog/api/blogs.controller';
 import { PostsController } from '@src/module/blog/api/posts.controller';
+import { CommentsController } from '@src/module/blog/api/comments.controller';
 import { CreateCommentUseCase } from '@src/module/blog/application/useCases/create-comment.usecase';
 import { UserAccountsModule } from '@src/module/user-accounts/user-accounts.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Blog, Post, Comment]), UserAccountsModule],
-  controllers: [BlogsController, PostsController],
+  controllers: [BlogsController, PostsController, CommentsController],
   exports: [
     BlogQueryRepository,
     BlogRepository,
