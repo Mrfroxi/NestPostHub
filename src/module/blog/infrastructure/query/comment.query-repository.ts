@@ -33,11 +33,7 @@ export type PaginatedCommentsDto = {
 
 @Injectable()
 export class CommentQueryRepository {
-  private readonly allowedSortFields = [
-    'createdAt',
-    'content',
-    'userLogin',
-  ];
+  private readonly allowedSortFields = ['createdAt', 'content', 'userLogin'];
 
   constructor(
     @InjectRepository(Comment)
@@ -45,7 +41,11 @@ export class CommentQueryRepository {
   ) {}
 
   async findById(id: string): Promise<CommentOutputDto | null> {
-    const comment = await this.commentsRepository.findOneBy({ id });
+    const comment = await this.commentsRepository
+      .createQueryBuilder('c')
+      .leftJoinAndSelect('c.user', 'u')
+      .where('c.id = :id', { id })
+      .getOne();
     if (!comment) return null;
 
     return {
@@ -53,7 +53,7 @@ export class CommentQueryRepository {
       content: comment.content,
       commentatorInfo: {
         userId: comment.userId,
-        userLogin: comment.userLogin,
+        userLogin: comment.user.login,
       },
       createdAt: comment.createdAt.toISOString(),
       likesInfo: {
@@ -76,10 +76,13 @@ export class CommentQueryRepository {
 
     const queryBuilder = this.commentsRepository.createQueryBuilder('c');
 
+    queryBuilder.leftJoinAndSelect('c.user', 'u');
     queryBuilder.where('c.postId = :postId', { postId });
 
-    const stringFields = ['content', 'userLogin'];
-    if (stringFields.includes(sortBy)) {
+    const stringFields = ['content'];
+    if (sortBy === 'userLogin') {
+      queryBuilder.orderBy(`u.login COLLATE "C"`, direction);
+    } else if (stringFields.includes(sortBy)) {
       queryBuilder.orderBy(`c.${sortBy} COLLATE "C"`, direction);
     } else {
       queryBuilder.orderBy(`c.${sortBy}`, direction);
@@ -100,7 +103,7 @@ export class CommentQueryRepository {
         content: c.content,
         commentatorInfo: {
           userId: c.userId,
-          userLogin: c.userLogin,
+          userLogin: c.user?.login,
         },
         createdAt: c.createdAt.toISOString(),
         likesInfo: {

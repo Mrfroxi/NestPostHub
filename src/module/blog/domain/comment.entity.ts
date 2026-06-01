@@ -7,6 +7,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import Post from './post.entity';
+import User from '@src/module/user-accounts/domain/user.entity';
 
 @Entity('comments')
 class Comment {
@@ -19,8 +20,9 @@ class Comment {
   @Column({ type: 'uuid', nullable: false })
   userId: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: false })
-  userLogin: string;
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'userId' })
+  user: User;
 
   @Column({ type: 'uuid', nullable: false })
   postId: string;
@@ -35,13 +37,11 @@ class Comment {
   static create(payload: {
     content: string;
     userId: string;
-    userLogin: string;
     postId: string;
   }): Comment {
     const comment = new Comment();
     comment.content = payload.content;
     comment.userId = payload.userId;
-    comment.userLogin = payload.userLogin;
     comment.postId = payload.postId;
     return comment;
   }
