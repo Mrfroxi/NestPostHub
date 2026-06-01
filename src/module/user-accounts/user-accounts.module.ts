@@ -12,6 +12,7 @@ import { RegistrationEmailResendingUseCase } from './application/useCases/auth/r
 import { NewPasswordUseCase } from './application/useCases/auth/new-password.usecase';
 import { PasswordRecoveryEmailUseCase } from './application/useCases/auth/password-recovery.usecase';
 import { JwtStrategy } from '@src/module/user-accounts/guards/bearer/jwt.strategy';
+import { JwtAuthGuard } from '@src/module/user-accounts/guards/bearer/jwt-auth.guard';
 import { JwtRefreshCookieGuard } from '@src/module/user-accounts/guards/cookie/jwt-cookie.guard';
 import { DeviceSession } from '@src/module/user-accounts/domain/device-session.entity';
 import { DeviceSessionRepository } from '@src/module/user-accounts/infrastructure/device-session.repository';
@@ -35,7 +36,7 @@ import { TerminateOtherSessionsUseCase } from './application/useCases/security/t
     PassportModule,
   ],
   controllers: [AuthController, SecurityController],
-  exports: [AuthQueryRepository, DeviceSessionRepository, UsersRepository],
+  exports: [AuthQueryRepository, DeviceSessionRepository, UsersRepository, JwtAuthGuard],
   providers: [
     UserAccountsConfig,
     UsersRepository,
@@ -78,6 +79,7 @@ import { TerminateOtherSessionsUseCase } from './application/useCases/security/t
       inject: [UserAccountsConfig],
     },
     JwtStrategy,
+    JwtAuthGuard,
   ],
 })
 export class UserAccountsModule {}
