@@ -20,6 +20,9 @@ import {
   CurrentUser,
   type UserPayload,
 } from '@core/decorators/current-user.decorator';
+import { LikeCommentCommand } from '@src/module/blog/application/useCases/like-comment.usecase';
+import { LikeStatusInputDto } from '@src/module/blog/api/input-dto/like-status.input-dto';
+import { OptionalJwtAuthGuard } from '@src/module/blog/guards/optional-jwt-auth.guard';
 import { JwtAuthGuard } from '@src/module/user-accounts/guards/bearer/jwt-auth.guard';
 
 @Controller('comments')
@@ -29,9 +32,16 @@ export class CommentsController {
     private commandBus: CommandBus,
   ) {}
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Get(':id')
-  async getCommentById(@Param('id') id: string) {
-    const comment = await this.commentQueryRepository.findById(id);
+  async getCommentById(
+    @Param('id') id: string,
+    @CurrentUser() user?: UserPayload,
+  ) {
+    const comment = await this.commentQueryRepository.findById(
+      id,
+      user?.userId,
+    );
     if (!comment) {
       throw new DomainException({
         code: DomainExceptionCode.NotFound,
@@ -40,6 +50,19 @@ export class CommentsController {
     }
 
     return comment;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Put(':commentId/like-status')
+  async likeComment(
+    @Param('commentId') commentId: string,
+    @Body() body: LikeStatusInputDto,
+    @CurrentUser() user: UserPayload,
+  ) {
+    await this.commandBus.execute(
+      new LikeCommentCommand(commentId, user.userId, body.likeStatus),
+    );
   }
 
   @UseGuards(JwtAuthGuard)

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import Comment from '@src/module/blog/domain/comment.entity';
+import { CommentReactionRepository } from '@src/module/blog/infrastructure/comment-reaction.repository';
 import { GetCommentsQueryInputDto } from '@src/module/blog/api/input-dto/get-comments-query.input-dto';
 
 export type CommentatorInfo = {
@@ -38,15 +39,31 @@ export class CommentQueryRepository {
   constructor(
     @InjectRepository(Comment)
     private readonly commentsRepository: Repository<Comment>,
+    private readonly commentReactionRepository: CommentReactionRepository,
   ) {}
 
-  async findById(id: string): Promise<CommentOutputDto | null> {
+  async findById(
+    id: string,
+    currentUserId?: string,
+  ): Promise<CommentOutputDto | null> {
     const comment = await this.commentsRepository
       .createQueryBuilder('c')
       .leftJoinAndSelect('c.user', 'u')
       .where('c.id = :id', { id })
       .getOne();
     if (!comment) return null;
+
+    let myStatus: 'None' | 'Like' | 'Dislike' = 'None';
+    if (currentUserId) {
+      const reaction =
+        await this.commentReactionRepository.findByCommentIdAndUserId(
+          id,
+          currentUserId,
+        );
+      if (reaction) {
+        myStatus = reaction.likeStatus;
+      }
+    }
 
     return {
       id: comment.id,
@@ -57,9 +74,9 @@ export class CommentQueryRepository {
       },
       createdAt: comment.createdAt.toISOString(),
       likesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-        myStatus: 'None',
+        likesCount: comment.likesCount,
+        dislikesCount: comment.dislikesCount,
+        myStatus,
       },
     };
   }
@@ -67,6 +84,7 @@ export class CommentQueryRepository {
   async getCommentsForPostPaginated(
     postId: string,
     query: GetCommentsQueryInputDto,
+    currentUserId?: string,
   ): Promise<PaginatedCommentsDto> {
     const sortBy = this.allowedSortFields.includes(query.sortBy)
       ? query.sortBy
@@ -93,25 +111,41 @@ export class CommentQueryRepository {
       .take(query.pageSize)
       .getManyAndCount();
 
+    const reactionMap = new Map<string, 'Like' | 'Dislike'>();
+    if (currentUserId && comments.length > 0) {
+      const commentIds = comments.map((c) => c.id);
+      const reactions =
+        await this.commentReactionRepository.findByCommentIdsAndUserId(
+          commentIds,
+          currentUserId,
+        );
+      for (const r of reactions) {
+        reactionMap.set(r.commentId, r.likeStatus);
+      }
+    }
+
     return {
       pagesCount: Math.ceil(totalCount / query.pageSize),
       page: query.pageNumber,
       pageSize: query.pageSize,
       totalCount,
-      items: comments.map((c) => ({
-        id: c.id,
-        content: c.content,
-        commentatorInfo: {
-          userId: c.userId,
-          userLogin: c.user?.login,
-        },
-        createdAt: c.createdAt.toISOString(),
-        likesInfo: {
-          likesCount: 0,
-          dislikesCount: 0,
-          myStatus: 'None',
-        },
-      })),
+      items: comments.map((c) => {
+        const myStatus = reactionMap.get(c.id) ?? 'None';
+        return {
+          id: c.id,
+          content: c.content,
+          commentatorInfo: {
+            userId: c.userId,
+            userLogin: c.user?.login,
+          },
+          createdAt: c.createdAt.toISOString(),
+          likesInfo: {
+            likesCount: c.likesCount,
+            dislikesCount: c.dislikesCount,
+            myStatus,
+          },
+        };
+      }),
     };
   }
 }
