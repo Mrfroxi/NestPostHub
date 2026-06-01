@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import Post from '@src/module/blog/domain/post.entity';
+import { PostReactionRepository } from '@src/module/blog/infrastructure/post-reaction.repository';
 import { GetPostsQueryInputDto } from '@src/module/blog/api/input-dto/get-posts-query.input-dto';
 
 export type NewestLike = {
@@ -49,11 +50,20 @@ export class PostQueryRepository {
   constructor(
     @InjectRepository(Post)
     private readonly postsRepository: Repository<Post>,
+    private readonly postReactionRepository: PostReactionRepository,
   ) {}
 
-  async findById(id: string): Promise<PostOutputDto | null> {
+  async findById(
+    id: string,
+    currentUserId?: string,
+  ): Promise<PostOutputDto | null> {
     const post = await this.postsRepository.findOneBy({ id });
     if (!post) return null;
+
+    const { myStatus, newestLikes } = await this.buildLikesInfo(
+      [post],
+      currentUserId,
+    );
 
     return {
       id: post.id,
@@ -64,10 +74,10 @@ export class PostQueryRepository {
       blogName: post.blogName,
       createdAt: post.createdAt.toISOString(),
       extendedLikesInfo: {
-        likesCount: 0,
-        dislikesCount: 0,
-        myStatus: 'None',
-        newestLikes: [],
+        likesCount: post.likesCount,
+        dislikesCount: post.dislikesCount,
+        myStatus: myStatus.get(id) ?? 'None',
+        newestLikes: newestLikes.get(id) ?? [],
       },
     };
   }
@@ -75,6 +85,7 @@ export class PostQueryRepository {
   async getPostsForBlogPaginated(
     blogId: string,
     query: GetPostsQueryInputDto,
+    currentUserId?: string,
   ): Promise<PaginatedPostsDto> {
     const sortBy = this.allowedSortFields.includes(query.sortBy)
       ? query.sortBy
@@ -104,6 +115,11 @@ export class PostQueryRepository {
       .take(query.pageSize)
       .getManyAndCount();
 
+    const { myStatus, newestLikes } = await this.buildLikesInfo(
+      posts,
+      currentUserId,
+    );
+
     return {
       pagesCount: Math.ceil(totalCount / query.pageSize),
       page: query.pageNumber,
@@ -118,10 +134,10 @@ export class PostQueryRepository {
         blogName: p.blogName,
         createdAt: p.createdAt.toISOString(),
         extendedLikesInfo: {
-          likesCount: 0,
-          dislikesCount: 0,
-          myStatus: 'None',
-          newestLikes: [],
+          likesCount: p.likesCount,
+          dislikesCount: p.dislikesCount,
+          myStatus: myStatus.get(p.id) ?? 'None',
+          newestLikes: newestLikes.get(p.id) ?? [],
         },
       })),
     };
@@ -129,6 +145,7 @@ export class PostQueryRepository {
 
   async getAllPostsPaginated(
     query: GetPostsQueryInputDto,
+    currentUserId?: string,
   ): Promise<PaginatedPostsDto> {
     const sortBy = this.allowedSortFields.includes(query.sortBy)
       ? query.sortBy
@@ -156,6 +173,11 @@ export class PostQueryRepository {
       .take(query.pageSize)
       .getManyAndCount();
 
+    const { myStatus, newestLikes } = await this.buildLikesInfo(
+      posts,
+      currentUserId,
+    );
+
     return {
       pagesCount: Math.ceil(totalCount / query.pageSize),
       page: query.pageNumber,
@@ -170,12 +192,41 @@ export class PostQueryRepository {
         blogName: p.blogName,
         createdAt: p.createdAt.toISOString(),
         extendedLikesInfo: {
-          likesCount: 0,
-          dislikesCount: 0,
-          myStatus: 'None',
-          newestLikes: [],
+          likesCount: p.likesCount,
+          dislikesCount: p.dislikesCount,
+          myStatus: myStatus.get(p.id) ?? 'None',
+          newestLikes: newestLikes.get(p.id) ?? [],
         },
       })),
     };
+  }
+
+  private async buildLikesInfo(
+    posts: Post[],
+    currentUserId?: string,
+  ): Promise<{
+    myStatus: Map<string, 'None' | 'Like' | 'Dislike'>;
+    newestLikes: Map<string, NewestLike[]>;
+  }> {
+    const postIds = posts.map((p) => p.id);
+
+    const myStatus = new Map<string, 'None' | 'Like' | 'Dislike'>();
+    if (currentUserId && postIds.length > 0) {
+      const reactions =
+        await this.postReactionRepository.findByPostIdsAndUserId(
+          postIds,
+          currentUserId,
+        );
+      for (const r of reactions) {
+        myStatus.set(r.postId, r.likeStatus);
+      }
+    }
+
+    const newestLikes =
+      postIds.length > 0
+        ? await this.postReactionRepository.findNewestLikes(postIds)
+        : new Map();
+
+    return { myStatus, newestLikes };
   }
 }

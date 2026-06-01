@@ -35,6 +35,12 @@ class Post {
   @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt: Date;
 
+  @Column({ type: 'int', default: 0 })
+  likesCount: number;
+
+  @Column({ type: 'int', default: 0 })
+  dislikesCount: number;
+
   static create(payload: {
     title: string;
     shortDescription: string;
