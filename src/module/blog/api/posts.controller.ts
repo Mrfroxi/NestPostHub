@@ -13,6 +13,7 @@ import { CommandBus } from '@nestjs/cqrs';
 import { PostQueryRepository } from '@src/module/blog/infrastructure/query/post.query-repository';
 import { CommentQueryRepository } from '@src/module/blog/infrastructure/query/comment.query-repository';
 import { GetPostsQueryInputDto } from '@src/module/blog/api/input-dto/get-posts-query.input-dto';
+import { GetCommentsQueryInputDto } from '@src/module/blog/api/input-dto/get-comments-query.input-dto';
 import { CreateCommentInputDto } from '@src/module/blog/api/input-dto/create-comment.input-dto';
 import { CreateCommentCommand } from '@src/module/blog/application/useCases/create-comment.usecase';
 import { DomainException } from '@core/exceptions/domain-exceptions';
@@ -34,6 +35,25 @@ export class PostsController {
   @Get()
   async getPosts(@Query() query: GetPostsQueryInputDto) {
     return this.postQueryRepository.getAllPostsPaginated(query);
+  }
+
+  @Get(':postId/comments')
+  async getCommentsForPost(
+    @Param('postId') postId: string,
+    @Query() query: GetCommentsQueryInputDto,
+  ) {
+    const post = await this.postQueryRepository.findById(postId);
+    if (!post) {
+      throw new DomainException({
+        code: DomainExceptionCode.NotFound,
+        message: 'Post not found',
+      });
+    }
+
+    return this.commentQueryRepository.getCommentsForPostPaginated(
+      postId,
+      query,
+    );
   }
 
   @Get(':id')
