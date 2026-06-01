@@ -17,4 +17,8 @@ export class CommentRepository {
   async save(comment: Comment): Promise<Comment> {
     return this.commentsRepository.save(comment);
   }
+
+  async deleteById(id: string): Promise<void> {
+    await this.commentsRepository.delete(id);
+  }
 }

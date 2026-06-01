@@ -13,6 +13,7 @@ import { BlogsController } from '@src/module/blog/api/blogs.controller';
 import { PostsController } from '@src/module/blog/api/posts.controller';
 import { CommentsController } from '@src/module/blog/api/comments.controller';
 import { CreateCommentUseCase } from '@src/module/blog/application/useCases/create-comment.usecase';
+import { DeleteCommentUseCase } from '@src/module/blog/application/useCases/delete-comment.usecase';
 import { UserAccountsModule } from '@src/module/user-accounts/user-accounts.module';
 
 @Module({
@@ -33,6 +34,7 @@ import { UserAccountsModule } from '@src/module/user-accounts/user-accounts.modu
     CommentRepository,
     CommentQueryRepository,
     CreateCommentUseCase,
+    DeleteCommentUseCase,
   ],
 })
 export class BlogModule {}
