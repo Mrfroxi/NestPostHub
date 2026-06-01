@@ -1,28 +1,30 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CommentRepository } from '@src/module/blog/infrastructure/comment.repository';
+import { CreateCommentInputDto } from '@src/module/blog/api/input-dto/create-comment.input-dto';
 import { DomainException } from '@core/exceptions/domain-exceptions';
 import { DomainExceptionCode } from '@core/exceptions/domain-exception-codes';
 
-export class DeleteCommentCommand {
+export class UpdateCommentCommand {
   constructor(
     public commentId: string,
     public userId: string,
+    public dto: CreateCommentInputDto,
   ) {}
 }
 
-@CommandHandler(DeleteCommentCommand)
-export class DeleteCommentUseCase implements ICommandHandler<DeleteCommentCommand> {
+@CommandHandler(UpdateCommentCommand)
+export class UpdateCommentUseCase implements ICommandHandler<UpdateCommentCommand> {
   constructor(private commentRepository: CommentRepository) {}
 
-  async execute(command: DeleteCommentCommand): Promise<void> {
-    const { commentId, userId } = command;
+  async execute(command: UpdateCommentCommand): Promise<void> {
+    const { commentId, userId, dto } = command;
 
     const comment = await this.commentRepository.findById(commentId);
     if (!comment) {
       throw new DomainException({
         code: DomainExceptionCode.NotFound,
         message: 'Comment not found',
-        extensions: [{ message: 'comment not found', field: 'commentId' }],
+        extensions: [{ message: 'comment not found', field: 'comment' }],
       });
     }
 
@@ -34,6 +36,7 @@ export class DeleteCommentUseCase implements ICommandHandler<DeleteCommentComman
       });
     }
 
-    await this.commentRepository.deleteById(commentId);
+    comment.content = dto.content;
+    await this.commentRepository.save(comment);
   }
 }
